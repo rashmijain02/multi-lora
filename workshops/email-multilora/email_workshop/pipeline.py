@@ -11,8 +11,8 @@ from typing import Any
 
 from email_workshop.data import ADAPTERS, load_splits, prepare, write_json
 from email_workshop.evaluation import STRATEGIES, evaluate, lexical_predictions, score
-from email_workshop.modeling import LocalBackend, TrainConfig, train_adapter, verify_adapters
 from email_workshop.routing import fit_router
+from email_workshop.training import LocalBackend, TrainConfig, train_adapter, verify_adapters
 
 STAGES = ("prepare", "router", "train", "evaluate")
 

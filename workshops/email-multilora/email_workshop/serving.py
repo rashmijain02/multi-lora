@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import requests
 
 from email_workshop.data import ADAPTERS, DOMAINS, allowed_labels, write_json
-from email_workshop.modeling import prompt_ids, verify_adapters
+from email_workshop.training import prompt_ids, verify_adapters
 
 
 def vllm_command(root: Path, linux_run_root: str) -> list[str]:

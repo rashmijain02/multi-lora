@@ -50,7 +50,7 @@ def main() -> None:
         )
         print(json.dumps({"router": metadata, "validation": summary}, indent=2))
     elif args.command == "train":
-        from email_workshop.modeling import TrainConfig, train_adapter
+        from email_workshop.training import TrainConfig, train_adapter
 
         config = TrainConfig(
             device=args.device,
@@ -67,9 +67,9 @@ def main() -> None:
         print(shlex.join(vllm_command(root, args.linux_run_root)))
     else:
         from email_workshop.evaluation import STRATEGIES, evaluate, score
-        from email_workshop.modeling import LocalBackend, verify_adapters
         from email_workshop.routing import fit_router
         from email_workshop.serving import VllmBackend
+        from email_workshop.training import LocalBackend, verify_adapters
 
         manifests = verify_adapters(root)
         if not args.allow_smoke and any(item["purpose"] == "smoke" for item in manifests.values()):
