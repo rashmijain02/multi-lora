@@ -20,10 +20,12 @@ the model, not the [Container Apps API](AGENT_DEPLOYMENT.md).
    `python -m email_workshop.foundry_deploy --apply`. Do not change global CLI subscription.
 8. Confirm the model reports `Succeeded`. Report non-secret resource IDs, endpoint and
    deployment name. Never output `listKeys` or resolved secret-bearing parameter files.
-9. The operator privately fills the API's separate `.env` with endpoint/name/key. Follow the
-   API deployment runbook separately; obtain permission before remote email/model calls.
-10. Smoke with synthetic text only and report what actually ran. No live deployment/inference
-    claim is permitted from mocked tests or Bicep compilation alone.
+9. Run `python -m email_workshop.foundry_smoke` for the no-cloud configuration check. After
+   explicit inference approval, run it again with `--run`; it uses Azure CLI Entra authentication
+   and sends synthetic text only. Report what actually ran. No live deployment/inference claim is
+   permitted from mocked tests or Bicep compilation alone.
+10. The operator privately fills the API's separate `.env` with endpoint/name/key. Follow the
+    API deployment runbook separately; obtain permission before remote email/model calls.
 
 Stop on missing approval, quota, preview enrollment, compatibility, licensing, permissions,
 capacity, unexpected existing resources or private-network policy. Failures can leave paid

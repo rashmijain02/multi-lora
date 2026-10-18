@@ -181,6 +181,12 @@ def test_deployment_checks_placeholders(cloud_env, monkeypatch):
         deployment_config()
 
 
+def test_generated_placeholders_are_rejected(cloud_env, monkeypatch):
+    monkeypatch.setenv("FOUNDRY_MODEL", "REPLACE_WITH_DEPLOYMENT_NAME")
+    with pytest.raises(ValueError, match="FOUNDRY_MODEL"):
+        FoundryConfig.from_env()
+
+
 def test_deployment_rejects_invalid_app_name(cloud_env, monkeypatch):
     monkeypatch.setenv("AZURE_CONTAINER_APP", "email--workshop")
     with pytest.raises(ValueError, match="AZURE_CONTAINER_APP"):

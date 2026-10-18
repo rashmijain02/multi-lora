@@ -10,26 +10,15 @@ param projectName string
 param deploymentName string
 @description('Exact versioned model asset URI copied from the Foundry catalog.')
 param modelId string
-@description('Compatible versioned deployment template URI copied from the deployment wizard.')
+@description('Compatible deployment template URI ending in /labels/latest, as required by the managed-compute API.')
 param deploymentTemplateId string
 @description('Accelerator type supported by the selected template and approved quota.')
 param acceleratorType string
 @minValue(1)
 param capacity int = 1
 
-resource account 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
+resource account 'Microsoft.CognitiveServices/accounts@2025-06-01' existing = {
   name: accountName
-  location: location
-  kind: 'AIServices'
-  sku: { name: 'S0' }
-  identity: { type: 'SystemAssigned' }
-  properties: {
-    allowProjectManagement: true
-    customSubDomainName: accountName
-    // Required for the current workshop's API-key client and public outbound connection.
-    disableLocalAuth: false
-    publicNetworkAccess: 'Enabled'
-  }
 }
 
 resource project 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {

@@ -17,7 +17,7 @@ class FoundryError(RuntimeError):
 
 def required(name: str) -> str:
     value = os.environ.get(name, "").strip()
-    if not value or "REPLACE_ME" in value:
+    if not value or value == "REPLACE_ME" or value.startswith("REPLACE_WITH_"):
         raise ValueError(f"Set {name} to a non-placeholder value.")
     return value
 
