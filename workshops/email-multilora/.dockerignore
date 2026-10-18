@@ -1,0 +1,5 @@
+**
+!Dockerfile
+!pyproject.toml
+!email_workshop/
+!email_workshop/*.py

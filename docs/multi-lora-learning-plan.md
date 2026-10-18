@@ -1,5 +1,7 @@
 # Multi-LoRA Learning Plan
 
+> **Executable version:** The complete day-by-day curriculum, local papers, source catalog, and templates are in [`../curriculum/`](../curriculum/README.md). This document is the summary plan; each linked daily guide contains the detailed procedure, worksheets, evidence rules, deliverables, and exit checks.
+
 ## Objective
 Complete a very aggressive 2-week study sprint to understand multi-LoRA serving, compare open-source and vendor implementations, verify NVIDIA NIM claims, evaluate Azure deployment options, and produce a defensible architecture recommendation.
 
@@ -26,6 +28,8 @@ Several claims in the original summary are version-dependent or must be verified
 ## Week 1 — Ground truth and technical foundations
 
 ### Day 1 — Define the target and verify claims
+[Detailed Day 1 guide](../curriculum/day-01-target-and-claims/README.md)
+
 **Goal:** Turn the summary into a verified checklist.
 
 **Tasks**
@@ -47,6 +51,8 @@ Several claims in the original summary are version-dependent or must be verified
 - Clear understanding of what must be verified before recommendation.
 
 ### Day 2 — LoRA and multi-LoRA fundamentals
+[Detailed Day 2 guide](../curriculum/day-02-lora-foundations/README.md)
+
 **Goal:** Understand how multi-LoRA serving works at the systems level.
 
 **Tasks**
@@ -63,6 +69,8 @@ Several claims in the original summary are version-dependent or must be verified
 - Ability to explain why multi-LoRA is harder than normal inference.
 
 ### Day 3 — Research S-LoRA, Punica, and LoRAX
+[Detailed Day 3 guide](../curriculum/day-03-serving-research/README.md)
+
 **Goal:** Learn the core technical ideas behind modern multi-LoRA engines.
 
 **Tasks**
@@ -82,6 +90,8 @@ Several claims in the original summary are version-dependent or must be verified
 - Ability to explain what each system contributes technically.
 
 ### Day 4 — Compare open-source serving engines
+[Detailed Day 4 guide](../curriculum/day-04-engine-comparison/README.md)
+
 **Goal:** Understand which engine fits which workload.
 
 **Tasks**
@@ -96,6 +106,8 @@ Several claims in the original summary are version-dependent or must be verified
 - Defensible rationale for engine preference.
 
 ### Day 5 — Verify NVIDIA NIM reality
+[Detailed Day 5 guide](../curriculum/day-05-nim-verification/README.md)
+
 **Goal:** Separate marketing claims from actual supported behavior.
 
 **Tasks**
@@ -114,6 +126,8 @@ Several claims in the original summary are version-dependent or must be verified
 ## Week 2 — Azure deployment and recommendation
 
 ### Day 6 — Azure deployment options
+[Detailed Day 6 guide](../curriculum/day-06-azure-options/README.md)
+
 **Goal:** Identify the fastest viable Azure path.
 
 **Tasks**
@@ -128,6 +142,8 @@ Several claims in the original summary are version-dependent or must be verified
 - Best-fit Azure hosting model identified.
 
 ### Day 7 — Adapter storage and refresh design
+[Detailed Day 7 guide](../curriculum/day-07-adapter-lifecycle/README.md)
+
 **Goal:** Design how adapters will be stored, loaded, and refreshed.
 
 **Tasks**
@@ -145,6 +161,8 @@ Several claims in the original summary are version-dependent or must be verified
 - End-to-end adapter operations are clearly described.
 
 ### Day 8 — Benchmark design
+[Detailed Day 8 guide](../curriculum/day-08-benchmark-design/README.md)
+
 **Goal:** Define the minimum benchmark needed for a real comparison.
 
 **Tasks**
@@ -160,6 +178,8 @@ Several claims in the original summary are version-dependent or must be verified
 - A practical proof plan exists for comparison.
 
 ### Day 9 — Synthesize findings into an architecture recommendation
+[Detailed Day 9 guide](../curriculum/day-09-architecture-decision/README.md)
+
 **Goal:** Turn research into a decision.
 
 **Tasks**
@@ -175,6 +195,8 @@ Several claims in the original summary are version-dependent or must be verified
 - Defensible recommendation produced.
 
 ### Day 10 — Final review and action plan
+[Detailed Day 10 guide](../curriculum/day-10-final-review/README.md)
+
 **Goal:** Convert the study into next steps.
 
 **Tasks**
@@ -199,6 +221,8 @@ Several claims in the original summary are version-dependent or must be verified
 Total: 4–7 hours/day
 
 ## Must-Read References
+- Curated and annotated catalog: [curriculum source catalog](../curriculum/sources/README.md)
+- Downloaded open-access papers: [local paper library](../curriculum/papers/README.md)
 - S-LoRA overview: https://www.lmsys.org/blog/2023-11-15-slora/
 - S-LoRA paper: https://arxiv.org/abs/2311.03285
 - Punica paper: https://arxiv.org/abs/2310.18547
@@ -206,10 +230,10 @@ Total: 4–7 hours/day
 - NVIDIA multi-LoRA vLLM Triton tutorial: https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/vllm_backend/docs/llama_multi_lora_tutorial.html
 - NVIDIA NIM blog: https://developer.nvidia.com/blog/seamlessly-deploying-a-swarm-of-lora-adapters-with-nvidia-nim/
 - NVIDIA NIM LoRA docs: https://docs.nvidia.com/nim/large-language-models/latest/advanced-use-cases/finetune-lora.html
-- TensorRT-LLM LoRA docs: https://docs.nvidia.com/deeplearning/frameworks/tensorrt-llm-user-guide/docs/ptq/ptq_lora.html
+- TensorRT-LLM LoRA docs: https://nvidia.github.io/TensorRT-LLM/advanced/lora.html
 - TensorRT-LLM repository: https://github.com/NVIDIA/TensorRT-LLM
-- Azure Llama deployment guide: https://techcommunity.microsoft.com/t5/ai-machine-learning-blog/llama-2-on-azure/ba-p/3902499
-- Azure ML vLLM examples: https://github.com/microsoft/azureml-examples/tree/main/python/large-language-models/vllm
+- Azure ML custom container deployment: https://learn.microsoft.com/azure/machine-learning/how-to-deploy-custom-container
+- NVIDIA NIM deployment on Azure: https://docs.nvidia.com/nim/large-language-models/latest/deployment/csp-deployment/azure.html
 
 ## Fast-Start Reading List
 If time is limited, read these first:
@@ -220,7 +244,7 @@ If time is limited, read these first:
 5. https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/vllm_backend/docs/llama_multi_lora_tutorial.html
 6. https://developer.nvidia.com/blog/seamlessly-deploying-a-swarm-of-lora-adapters-with-nvidia-nim/
 7. https://docs.nvidia.com/nim/large-language-models/latest/advanced-use-cases/finetune-lora.html
-8. https://github.com/microsoft/azureml-examples/tree/main/python/large-language-models/vllm
+8. https://docs.nvidia.com/nim/large-language-models/latest/deployment/csp-deployment/azure.html
 
 ## Expected Outputs by End of 2 Weeks
 - Assumption register
