@@ -88,6 +88,20 @@ Edit `.env.foundry` locally. It is ignored by the repository's `.env.*` rule.
 Existing process environment variables take precedence; avoid mixing settings from another
 subscription or environment in the same terminal.
 
+If you already have a repository-root `.env` for the same subscription, you can probe the
+current Azure environment before filling `.env.foundry`:
+
+```powershell
+python -m email_workshop.foundry_probe
+```
+
+The probe is read-only. It loads `workshops/email-multilora/.env.foundry`,
+`workshops/email-multilora/.env` and the repository-root `.env` when present, then reports the
+resolved subscription/resource-group/account/project context, existing AI Services accounts and
+any managed-compute deployments it can see. It does **not** invent `FOUNDRY_MODEL_ID`,
+`FOUNDRY_DEPLOYMENT_TEMPLATE_ID` or `FOUNDRY_ACCELERATOR_TYPE`; those still must come from the
+Foundry catalog deploy wizard for the exact Nemotron variant you plan to use.
+
 | Setting | Purpose |
 |---|---|
 | `AZURE_SUBSCRIPTION_ID` | Explicit subscription; shared variable name with API hosting |
