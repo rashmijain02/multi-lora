@@ -6,7 +6,7 @@ import pytest
 
 from email_workshop import pipeline
 from email_workshop.data import ADAPTERS
-from email_workshop.modeling import TrainConfig
+from email_workshop.training import TrainConfig
 
 
 def fake_splits():
