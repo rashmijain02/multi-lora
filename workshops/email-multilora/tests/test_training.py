@@ -14,7 +14,9 @@ from transformers import PreTrainedTokenizerFast, Qwen2Config, Qwen2ForCausalLM
 
 from email_workshop.data import ADAPTERS, load_splits
 from email_workshop.evaluation import STRATEGIES, evaluate, score
-from email_workshop.modeling import (
+from email_workshop.routing import fit_router
+from email_workshop.serving import VllmBackend, concurrent_demo, vllm_command
+from email_workshop.training import (
     CompletionCollator,
     LocalBackend,
     TrainConfig,
@@ -22,8 +24,6 @@ from email_workshop.modeling import (
     training_example,
     verify_adapters,
 )
-from email_workshop.routing import fit_router
-from email_workshop.serving import VllmBackend, concurrent_demo, vllm_command
 
 
 @pytest.fixture

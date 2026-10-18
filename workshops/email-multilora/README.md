@@ -98,6 +98,10 @@ See [FACILITATOR.md](FACILITATOR.md) for guided questions, expected observations
 
 ## Environment setup: Windows / VS Code
 
+For repeatable Windows and Linux/WSL setup, GPU verification, smoke training, and full local
+evaluation commands, follow [the local environment guide](docs/LOCAL_SETUP.md).
+The setup scripts create/reuse only the workshop `.venv`; they never deploy Azure resources.
+
 Use Python 3.11-3.13; Python 3.12 is the validation target.
 
 For a workshop-only VS Code window, use **File > Open Workspace from File** and open [email-multilora.code-workspace](email-multilora.code-workspace). This scopes Python environment discovery to the workshop and defaults to its `.venv`, rather than the parent workspace's environment.
@@ -142,7 +146,7 @@ Existing data is verified and reused by the notebook. The CLI preparation comman
 Install the CUDA wheel **before** the training extra:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cu128
+.\.venv\Scripts\python.exe -m pip install torch==2.10.0+cu128 --index-url https://download.pytorch.org/whl/cu128
 .\.venv\Scripts\python.exe -m pip install -e '.[training,dev]'
 .\.venv\Scripts\python.exe -c "import torch; print(torch.__version__); print('CUDA available:', torch.cuda.is_available())"
 ```
@@ -154,7 +158,7 @@ The small 0.5B model, batch size 1, LoRA rank 8, and 512-token context are chose
 ### CPU-only validation
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+.\.venv\Scripts\python.exe -m pip install torch==2.10.0+cpu --index-url https://download.pytorch.org/whl/cpu
 .\.venv\Scripts\python.exe -m pip install -e '.[training,dev]'
 ```
 
