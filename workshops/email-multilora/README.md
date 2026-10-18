@@ -172,6 +172,63 @@ The training stack pins Transformers 4.57.6, PEFT 0.18.1, Accelerate 1.12.0, PyT
 
 Notebook 02 defaults to `SMOKE_ONLY = True`. A smoke run is real training but is not sufficient for quality claims. Use a separate run root for full training. Do not silently overwrite smoke weights.
 
+## Single staged Python pipeline
+
+The package provides one orchestrator for the local experiment: prepare data, fit the router,
+train all four adapters, and evaluate all four strategies. It prints JSON stage events to stderr,
+writes resumable status under the selected artifact root, and prints the final result to stdout.
+
+Start from the workshop directory. First review the resolved smoke plan; without `--run` this
+makes no download, training, evaluation, Azure or Foundry call:
+
+```powershell
+.\.venv\Scripts\python.exe -m email_workshop.pipeline `
+  --profile smoke `
+  --artifacts .\artifacts\pipeline-smoke
+```
+
+After installing the training dependencies and reviewing the plan, run the bounded CPU smoke:
+
+```powershell
+.\.venv\Scripts\python.exe -m email_workshop.pipeline `
+  --profile smoke `
+  --artifacts .\artifacts\pipeline-smoke `
+  --run
+```
+
+The smoke profile defaults to CPU, two optimizer steps, 16 train/validation examples per adapter,
+and four validation rows per evaluation strategy. It downloads the pinned public dataset and
+Qwen model when they are not already cached. This is real but deliberately tiny training; its
+scores are pipeline diagnostics, never classification-quality evidence.
+
+For the full GPU experiment, use a new artifact root and the explicit full profile:
+
+```powershell
+.\.venv\Scripts\python.exe -m email_workshop.pipeline `
+  --profile full `
+  --device cuda `
+  --artifacts .\artifacts\full-run-01 `
+  --run
+```
+
+The full profile rejects smoke limits. It evaluates validation by default; add `--include-test`
+only after freezing the design. Existing verified data and complete adapter directories are
+reused after their seed, router target, data lineage, checksums and training configuration are
+checked. Evaluation checkpoints resume from their completed prefix. An incomplete adapter
+directory or conflicting configuration stops the pipeline instead of overwriting artifacts.
+Use a new artifact root to change the seed, source, profile, router target or model-training
+configuration.
+
+Pipeline records:
+
+- `pipeline/status.json` — latest completed stages for operational visibility;
+- `pipeline/result.json` — final stage and evaluation summaries;
+- `data/`, `router/`, `adapters/`, and `evaluation/` — the same inspectable artifacts produced by
+  the individual commands.
+
+This pipeline is local. It does not provision Foundry, call the managed Nemotron deployment,
+start vLLM, or deploy Container Apps; those remain separately approved operational workflows.
+
 ## Equivalent command-line workflow
 
 From the workshop directory:

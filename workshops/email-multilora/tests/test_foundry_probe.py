@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 
@@ -13,21 +12,17 @@ def test_probe_uses_repo_root_env_and_discovers_existing_foundry_assets(tmp_path
     workshop_root = repo_root / "workshops" / "email-multilora"
     workshop_root.mkdir(parents=True)
     (repo_root / ".env").write_text(
-        "\n".join(
-            [
-                "AZURE_SUBSCRIPTION_ID=test-subscription",
-                "AZURE_RESOURCE_GROUP=synthetic-workshop-rg",
-                "AZURE_LOCATION=synthetic-region",
-                "AZURE_AI_PROJECT_NAME=synthetic-project",
-                "AZURE_AI_PROJECT_ENDPOINT=https://synthetic-account.services.ai.azure.com/api/projects/synthetic-project",
-            ]
-        ),
+        "AZURE_SUBSCRIPTION_ID=test-subscription\n"
+        "AZURE_RESOURCE_GROUP=synthetic-workshop-rg\n"
+        "AZURE_LOCATION=synthetic-region\n"
+        "AZURE_AI_PROJECT_NAME=synthetic-project\n"
+        "AZURE_AI_PROJECT_ENDPOINT=https://synthetic-account.services.ai.azure.com/api/projects/synthetic-project",
         encoding="utf-8",
     )
     monkeypatch.setattr(foundry_probe, "ROOT", workshop_root)
     monkeypatch.setattr(foundry_probe, "REPO_ROOT", repo_root)
     for name in list(foundry_probe.os.environ):
-        if name.startswith("AZURE_") or name.startswith("FOUNDRY_"):
+        if name.startswith(("AZURE_", "FOUNDRY_")):
             monkeypatch.delenv(name, raising=False)
 
     calls = []
@@ -99,7 +94,7 @@ def test_probe_uses_repo_root_env_and_discovers_existing_foundry_assets(tmp_path
                                 "provisioningState": "Succeeded",
                                 "acceleratorType": "H100_80GB",
                                 "model": "azureml://registries/azure-huggingface/models/nvidia--synthetic/versions/2",
-                                "deploymentTemplate": "azureml://registries/azure-huggingface/deploymenttemplates/synthetic/versions/4",
+                                "deploymentTemplate": "azureml://registries/azure-huggingface/deploymenttemplates/synthetic/labels/latest",
                             },
                         }
                     ]
@@ -115,7 +110,7 @@ def test_probe_uses_repo_root_env_and_discovers_existing_foundry_assets(tmp_path
     assert result["resolvedInputs"]["inferredTargetAccountName"] == "synthetic-account"
     assert result["resolvedInputs"]["inferredTargetProjectName"] == "synthetic-project"
     assert result["providerRegistration"]["registrationState"] == "Registered"
-    assert result["recommendedEnvFoundry"]["FOUNDRY_RESOURCE_GROUP"] == "synthetic-workshop-rg-foundry"
+    assert result["recommendedEnvFoundry"]["FOUNDRY_RESOURCE_GROUP"] == "synthetic-workshop-rg"
     assert result["recommendedEnvFoundry"]["FOUNDRY_ACCOUNT_NAME"] == "synthetic-account"
     assert result["projects"][0]["name"] == "synthetic-project"
     assert result["managedComputeDeployments"][0]["name"] == "existing-nemotron"
@@ -128,19 +123,15 @@ def test_probe_returns_partial_result_when_target_account_is_unknown(tmp_path, m
     workshop_root = repo_root / "workshops" / "email-multilora"
     workshop_root.mkdir(parents=True)
     (repo_root / ".env").write_text(
-        "\n".join(
-            [
-                "AZURE_SUBSCRIPTION_ID=test-subscription",
-                "AZURE_RESOURCE_GROUP=synthetic-workshop-rg",
-                "AZURE_LOCATION=synthetic-region",
-            ]
-        ),
+        "AZURE_SUBSCRIPTION_ID=test-subscription\n"
+        "AZURE_RESOURCE_GROUP=synthetic-workshop-rg\n"
+        "AZURE_LOCATION=synthetic-region",
         encoding="utf-8",
     )
     monkeypatch.setattr(foundry_probe, "ROOT", workshop_root)
     monkeypatch.setattr(foundry_probe, "REPO_ROOT", repo_root)
     for name in list(foundry_probe.os.environ):
-        if name.startswith("AZURE_") or name.startswith("FOUNDRY_"):
+        if name.startswith(("AZURE_", "FOUNDRY_")):
             monkeypatch.delenv(name, raising=False)
 
     def run(*args: str) -> str:
@@ -163,3 +154,35 @@ def test_probe_returns_partial_result_when_target_account_is_unknown(tmp_path, m
     assert result["projects"] == []
     assert result["managedComputeDeployments"] == []
     assert "FOUNDRY_ACCOUNT_NAME" in result["missingValues"]
+
+
+def test_probe_writes_proposal_file(tmp_path, monkeypatch):
+    repo_root = tmp_path / "multi-lora"
+    workshop_root = repo_root / "workshops" / "email-multilora"
+    workshop_root.mkdir(parents=True)
+    monkeypatch.setattr(foundry_probe, "ROOT", workshop_root)
+    monkeypatch.setattr(foundry_probe, "REPO_ROOT", repo_root)
+
+    result = {
+        "recommendedEnvFoundry": {
+            "AZURE_SUBSCRIPTION_ID": "test-subscription",
+            "FOUNDRY_RESOURCE_GROUP": "synthetic-workshop-rg",
+            "FOUNDRY_LOCATION": "synthetic-region",
+            "FOUNDRY_ACCOUNT_NAME": "synthetic-account",
+            "FOUNDRY_PROJECT_NAME": "synthetic-project",
+            "FOUNDRY_DEPLOYMENT_NAME": "nemotron-email",
+            "FOUNDRY_MODEL_ID": "",
+            "FOUNDRY_DEPLOYMENT_TEMPLATE_ID": "",
+            "FOUNDRY_ACCELERATOR_TYPE": "",
+            "FOUNDRY_CAPACITY": "1",
+        }
+    }
+
+    proposal = foundry_probe.write_proposal_file(result)
+
+    assert proposal == workshop_root / ".env.foundry.proposal"
+    content = proposal.read_text(encoding="utf-8")
+    assert "AZURE_SUBSCRIPTION_ID=test-subscription" in content
+    assert "FOUNDRY_RESOURCE_GROUP=synthetic-workshop-rg" in content
+    assert "FOUNDRY_MODEL_ID=REPLACE_WITH_VERSIONED_MODEL_URI" in content
+    assert "FOUNDRY_DEPLOYMENT_TEMPLATE_ID=REPLACE_WITH_TEMPLATE_LABEL_URI" in content
