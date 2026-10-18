@@ -1,12 +1,11 @@
 import json
-from dataclasses import asdict
 from unittest.mock import Mock
 
 import pytest
 
 from email_workshop import pipeline
 from email_workshop.data import ADAPTERS
-from email_workshop.training import TrainConfig
+from email_workshop.training import TrainConfig, train_config_dict
 
 
 def fake_splits():
@@ -18,9 +17,7 @@ def patch_pipeline_stages(monkeypatch):
     manifest = {
         "dataset": "synthetic-test",
         "seed": 2026,
-        "splits": {
-            name: {"rows": len(rows)} for name, rows in fake_splits().items()
-        },
+        "splits": {name: {"rows": len(rows)} for name, rows in fake_splits().items()},
     }
     prepare = Mock(return_value=manifest)
     load_splits = Mock(return_value=(fake_splits(), manifest))
@@ -31,13 +28,9 @@ def patch_pipeline_stages(monkeypatch):
     }
     fit_router = Mock(return_value=(router, router_metadata))
     train_adapter = Mock()
-    training_config = asdict(
-        TrainConfig(device="cpu", max_steps=2, sample_limit=16)
-    )
+    training_config = train_config_dict(TrainConfig(device="cpu", max_steps=2, sample_limit=16))
     verify_adapters = Mock(
-        return_value={
-            name: {"purpose": "smoke", "config": training_config} for name in ADAPTERS
-        }
+        return_value={name: {"purpose": "smoke", "config": training_config} for name in ADAPTERS}
     )
     local_backend = Mock(return_value=Mock(identity={"backend": "synthetic"}))
     lexical_predictions = Mock(return_value=[{"id": "synthetic"}])
@@ -111,17 +104,24 @@ def test_model_override_is_preserved_in_plan(monkeypatch):
             "pipeline",
             "--profile",
             "smoke",
+            "--model-profile",
+            "custom",
             "--model-id",
             "nvidia/example",
             "--model-revision",
             "immutable-revision",
+            "--target-modules",
+            "q_proj",
+            "v_proj",
         ],
     )
 
     config = pipeline.resolved_config(pipeline.build_parser().parse_args())
 
+    assert config.model_profile == "custom"
     assert config.model_id == "nvidia/example"
     assert config.model_revision == "immutable-revision"
+    assert config.target_modules == ("q_proj", "v_proj")
 
 
 def test_smoke_pipeline_runs_all_stages_and_writes_result(tmp_path, monkeypatch):
@@ -148,9 +148,7 @@ def test_smoke_pipeline_runs_all_stages_and_writes_result(tmp_path, monkeypatch)
         for call in calls["train_adapter"].call_args_list
     )
     assert calls["evaluate"].call_count == 4
-    assert {call.args[4] for call in calls["evaluate"].call_args_list} == set(
-        pipeline.STRATEGIES
-    )
+    assert {call.args[4] for call in calls["evaluate"].call_args_list} == set(pipeline.STRATEGIES)
     assert (config.root / "pipeline" / "status.json").is_file()
     saved = json.loads((config.root / "pipeline" / "result.json").read_text(encoding="utf-8"))
     assert saved["status"] == "completed"

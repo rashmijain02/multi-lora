@@ -14,8 +14,6 @@ from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
 
 DATASET_ID = "imnim/multiclass-email-classification"
 DATASET_REVISION = "e95090f0bb6dae0b05c9cd6db314dcae1d40db3f"
-MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-MODEL_REVISION = "7ae557604adf67be50417f59c2c2f167def9a775"
 LABELS = (
     "Business",
     "Customer Support",

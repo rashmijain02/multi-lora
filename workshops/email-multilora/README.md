@@ -1,6 +1,13 @@
 # Multi-LoRA Email Classification Workshop
 
-Build, train, and evaluate a multi-label email classifier with one shared language model and separate operations, finance, and travel LoRA adapters.
+Build, train, and evaluate a multi-label email classifier with one configurable, pinned
+open-weight language model and separate operations, finance, and travel LoRA adapters.
+The workshop defaults to a small Qwen profile for accessibility, but Qwen is not part of
+the task definition or architecture.
+
+New to the source? Read the [code companion](docs/CODE_COMPANION.md) for a guided tour of
+the dataset, router, LoRA training, adapter switching, evaluation, pipeline, tests and
+separate Azure hosting path.
 
 For a separately hosted **managed Nemotron inference** path, see the
 [Azure setup and deployment guide](docs/AZURE_DEPLOYMENT.md) and
@@ -47,7 +54,7 @@ flowchart LR
     R --> O[Operations LoRA]
     R --> F[Finance LoRA]
     R --> T[Travel LoRA]
-    B[One frozen Qwen base] --- O
+    B[One frozen selected base] --- O
     B --- F
     B --- T
     O --> U[Validate JSON and union labels]
@@ -55,6 +62,11 @@ flowchart LR
     T --> U
     U --> M[Same-row evaluation and routing coverage]
 ```
+
+The model choice is a run configuration. Every adapter in one run must use the same profile,
+base revision, target modules, prompt contract and hyperparameters. Different models use
+different artifact roots. A future cross-model comparison can then join metrics by identical
+dataset/split fingerprints without mixing adapters from different bases.
 
 | Adapter | Output vocabulary | Why it exists |
 |---|---|---|
@@ -202,7 +214,7 @@ After installing the training dependencies and reviewing the plan, run the bound
 
 The smoke profile defaults to CPU, two optimizer steps, 16 train/validation examples per adapter,
 and four validation rows per evaluation strategy. It downloads the pinned public dataset and
-Qwen model when they are not already cached. This is real but deliberately tiny training; its
+the selected model when they are not already cached. This is real but deliberately tiny training; its
 scores are pipeline diagnostics, never classification-quality evidence.
 
 For the full GPU experiment, use a new artifact root and the explicit full profile:
@@ -266,10 +278,20 @@ The CLI evaluation compares the four LLM strategies. Notebook 03 additionally in
 
 ## Model and training contract
 
-- Base: [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct).
-- Base revision: `7ae557604adf67be50417f59c2c2f167def9a775`.
-- Model-card license: Apache 2.0.
-- LoRA: rank 8, alpha 16, dropout 0.05, `q_proj` and `v_proj`, frozen base.
+- Base model is selected through a model profile in
+  [`model_profiles.py`](email_workshop/model_profiles.py).
+- Every profile pins an immutable revision, LoRA target modules, display name, license name/link,
+  and operational notes.
+- Built-in profiles:
+  - `qwen2.5-0.5b` — accessible default,
+    [Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct).
+  - `nemotron-nano-8b` — locally validated larger option,
+    [Llama-3.1-Nemotron-Nano-8B-v1](https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-8B-v1).
+- `custom` requires an explicit model ID, immutable revision and target-module list.
+- A model is compatible only if Transformers can load it without unreviewed remote code,
+  it has a usable chat template and EOS token, it is a causal language model, and the named
+  LoRA target modules exist. Hardware fit and license suitability remain operator decisions.
+- LoRA defaults: rank 8, alpha 16, dropout 0.05 and frozen base.
 - Full default: two epochs, learning rate `2e-4`, batch size 1, accumulation 8.
 - Same train partition, seed, base, precision policy, and hyperparameters for all four adapters.
 - Validation loss selects the best saved checkpoint; no test examples reach Trainer.
@@ -279,6 +301,66 @@ The CLI evaluation compares the four LLM strategies. Notebook 03 additionally in
 - Trackio stays local (`space_id=None`), with no Hub push and no automatic dashboard server.
 
 The generalist receives one training pass budget while three specialists together consume about three times that adapter-training budget. Disclose that compute difference when discussing quality gains.
+
+### Choose a model
+
+Notebook 02 exposes `MODEL_CHOICE` in its first code cell. Notebook 03 exposes the same
+choice and refuses to evaluate adapters whose manifest does not match it.
+
+For the staged pipeline:
+
+```powershell
+# Accessible default
+.\.venv\Scripts\python.exe -m email_workshop.pipeline `
+  --profile full `
+  --device cuda `
+  --model-profile qwen2.5-0.5b `
+  --artifacts .\artifacts\qwen-full-01
+
+# Larger validated profile
+.\.venv\Scripts\python.exe -m email_workshop.pipeline `
+  --profile full `
+  --device cuda `
+  --model-profile nemotron-nano-8b `
+  --artifacts .\artifacts\nemotron-full-01
+```
+
+These examples print plans only. Add `--run` after reviewing model license, download size,
+hardware fit, artifact root and test-split policy.
+
+For another compatible open-weight model:
+
+```powershell
+.\.venv\Scripts\python.exe -m email_workshop.pipeline `
+  --profile smoke `
+  --device cuda `
+  --model-profile custom `
+  --model-id 'publisher/model-name' `
+  --model-revision 'IMMUTABLE_COMMIT_SHA' `
+  --target-modules q_proj v_proj `
+  --artifacts .\artifacts\custom-model-smoke
+```
+
+Do not guess target modules or use a moving branch/tag. Run the smoke and inspect the manifest
+before attempting a full run.
+
+### Cross-model comparison contract
+
+Cross-model comparison is a separate analysis layer, not implicit adapter mixing. A valid
+comparison requires:
+
+- Identical dataset revision, split hashes and row order.
+- Identical label taxonomy and prompt contract.
+- Same seed, LoRA rank, epochs, learning rate, batch/accumulation and evaluation strategies,
+  unless a documented ablation intentionally changes one.
+- One fresh artifact root per model profile.
+- Complete manifests containing profile, model ID/revision and target modules.
+- Paired metrics on the same validation or frozen test IDs.
+- Training time, parameter count, invalid-output rate and latency reported alongside quality.
+
+Adapters from different base models cannot be loaded into one shared base or compared by
+filename alone. Future comparison tooling should consume manifests and metrics from multiple
+run roots and reject mismatched data/prompt/config fingerprints.
 
 ## Evaluation interpretation
 
@@ -312,7 +394,7 @@ Predictions resume only if backend identity, adapter manifests, runtime versions
 
 1. Finish training and verify the four adapter manifests.
 2. Release notebook GPU memory by restarting/shutting down its kernel.
-3. In a separate Linux/WSL2 environment, install a version of vLLM that explicitly supports Qwen2.5 and LoRA. Record the exact installed release and container digest if applicable. Follow the [official installation guide](https://docs.vllm.ai/en/stable/getting_started/installation/gpu/).
+3. In a separate Linux/WSL2 environment, install a version of vLLM that explicitly supports the selected base architecture and LoRA. Record the exact installed release and container digest if applicable. Follow the [official installation guide](https://docs.vllm.ai/en/stable/getting_started/installation/gpu/).
 4. Make the repository and the same adapter files visible to that environment, not a new empty directory.
 5. From the workshop directory, generate and inspect the static server command:
 

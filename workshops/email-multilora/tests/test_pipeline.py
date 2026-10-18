@@ -170,6 +170,10 @@ def test_notebooks_have_clear_gates_and_no_outputs():
         notebook = nbformat.read(path, as_version=4)
         nbformat.validate(notebook)
         assert notebook.cells[0].cell_type == "markdown"
+        config = next(cell for cell in notebook.cells if cell.get("id") == "config")
+        if path.name != "01_email_data_and_routing.ipynb":
+            assert "MODEL_CHOICE" in config.source
+            assert "resolve_model_profile" in config.source
         for index, cell in enumerate(notebook.cells):
             if cell.cell_type == "code":
                 assert cell.outputs == [] and cell.execution_count is None

@@ -12,8 +12,6 @@ from typing import Any
 
 from email_workshop.data import (
     ADAPTERS,
-    MODEL_ID,
-    MODEL_REVISION,
     allowed_labels,
     fingerprint,
     load_splits,
@@ -21,12 +19,22 @@ from email_workshop.data import (
     read_json,
     write_json,
 )
+from email_workshop.model_profiles import (
+    CUSTOM_MODEL_PROFILE,
+    DEFAULT_MODEL_PROFILE,
+    MODEL_PROFILES,
+    profile_for_model,
+)
+
+DEFAULT_PROFILE = MODEL_PROFILES[DEFAULT_MODEL_PROFILE]
 
 
 @dataclass(frozen=True)
 class TrainConfig:
-    model_id: str = MODEL_ID
-    model_revision: str = MODEL_REVISION
+    model_profile: str = DEFAULT_PROFILE.key
+    model_id: str = DEFAULT_PROFILE.model_id
+    model_revision: str = DEFAULT_PROFILE.revision
+    target_modules: tuple[str, ...] = DEFAULT_PROFILE.target_modules
     seed: int = 2026
     max_length: int = 512
     rank: int = 8
@@ -37,6 +45,41 @@ class TrainConfig:
     max_steps: int = -1
     sample_limit: int | None = None
     device: str = "cuda"
+
+    def __post_init__(self) -> None:
+        if (
+            not self.model_profile.strip()
+            or not self.model_id.strip()
+            or not self.model_revision.strip()
+            or not self.target_modules
+            or any(not item.strip() for item in self.target_modules)
+        ):
+            raise ValueError(
+                "Model profile, model ID, immutable revision, and target modules are required."
+            )
+        if self.model_profile in MODEL_PROFILES:
+            profile = MODEL_PROFILES[self.model_profile]
+            if (
+                self.model_id,
+                self.model_revision,
+                self.target_modules,
+            ) != (
+                profile.model_id,
+                profile.revision,
+                profile.target_modules,
+            ):
+                raise ValueError(
+                    "Built-in model profile details must match the registry exactly; "
+                    "use the custom profile for another model."
+                )
+        elif self.model_profile != CUSTOM_MODEL_PROFILE:
+            raise ValueError("model_profile must be a registered profile or custom.")
+
+
+def train_config_dict(config: TrainConfig) -> dict[str, Any]:
+    value = asdict(config)
+    value["target_modules"] = list(config.target_modules)
+    return value
 
 
 def prompt_ids(
@@ -174,6 +217,12 @@ def train_adapter(root: Path, adapter: str, config: TrainConfig) -> dict[str, An
         attn_implementation="eager",
     )
     model.config.use_cache = False
+    available_modules = {name.rsplit(".", 1)[-1] for name, _ in model.named_modules()}
+    if missing := set(config.target_modules) - available_modules:
+        raise ValueError(
+            f"Model is missing configured LoRA target modules: {sorted(missing)}. "
+            "Choose a compatible profile or correct the custom target modules."
+        )
     model = get_peft_model(
         model,
         LoraConfig(
@@ -182,7 +231,7 @@ def train_adapter(root: Path, adapter: str, config: TrainConfig) -> dict[str, An
             lora_dropout=0.05,
             bias="none",
             task_type="CAUSAL_LM",
-            target_modules=["q_proj", "v_proj"],
+            target_modules=list(config.target_modules),
         ),
     )
     selected = splits["train"]
@@ -244,7 +293,7 @@ def train_adapter(root: Path, adapter: str, config: TrainConfig) -> dict[str, An
         project="email-multilora-local",
         name=f"{root.name}-{adapter}",
         space_id=None,
-        config={**asdict(config), "adapter": adapter},
+        config={**train_config_dict(config), "adapter": adapter},
     )
     started = time.perf_counter()
     try:
@@ -253,7 +302,7 @@ def train_adapter(root: Path, adapter: str, config: TrainConfig) -> dict[str, An
         tokenizer.save_pretrained(destination)
         manifest = {
             "adapter": adapter,
-            "config": asdict(config),
+            "config": train_config_dict(config),
             "data_fingerprint": fingerprint(data_manifest),
             "train_rows": len(training),
             "validation_rows": len(validation),
@@ -285,6 +334,22 @@ def verify_adapters(root: Path) -> dict[str, dict]:
     for name in ADAPTERS:
         directory = root / "adapters" / name
         item = read_json(directory / "manifest.json")
+        config = item["config"]
+        if "model_profile" not in config or "target_modules" not in config:
+            profile = profile_for_model(config["model_id"], config["model_revision"])
+            if profile is None:
+                raise ValueError(
+                    f"{name} uses a legacy manifest whose model cannot be mapped to a "
+                    "registered profile. Retrain or migrate it explicitly."
+                )
+            item = {
+                **item,
+                "config": {
+                    **config,
+                    "model_profile": profile.key,
+                    "target_modules": list(profile.target_modules),
+                },
+            }
         if item["adapter"] != name or item["data_fingerprint"] != fingerprint(data_manifest):
             raise ValueError(f"{name} adapter identity or data lineage mismatch.")
         if item["files"] != file_hashes(directory):

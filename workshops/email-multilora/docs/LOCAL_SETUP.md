@@ -2,8 +2,9 @@
 
 All examples start at the `multi-lora` repository root and then enter the workshop.
 No Azure account, endpoint, `.env`, or paid cloud resource is needed. This path downloads
-the public pinned dataset and Qwen2.5-0.5B model, trains four local LoRA adapters, and
-evaluates them locally. It does **not** train Nemotron or call Foundry.
+the public pinned dataset and the open-weight model selected by a pinned profile, trains four
+local LoRA adapters, and evaluates them locally. It does not call Foundry. The accessible
+default is Qwen2.5-0.5B; the locally validated larger option is Nemotron Nano 8B.
 
 ## Requirements
 
@@ -121,27 +122,28 @@ no runtime or quality improvement is guaranteed.
 
 ### Run the same cycle with another compatible base
 
-Both the individual `train` command and staged pipeline accept an explicit, immutable
-model ID/revision. Verify the architecture, license, chat template, target modules and
-hardware fit before a full run. Never use a floating model revision for a comparison.
+Both the individual `train` command and staged pipeline use model profiles. Verify the
+architecture, license, chat template, target modules and hardware fit before a full run.
+Never use a floating model revision for a comparison.
 
 Example using the locally validated NVIDIA model:
 
 ```powershell
-$model = 'nvidia/Llama-3.1-Nemotron-Nano-8B-v1'
-$revision = '54641c1611fcff44fa4865626462445e0a153fc7'
 $run = 'artifacts/nemotron-nano-8b-full-20261018'
 & $python -m email_workshop.pipeline `
   --profile full `
   --device cuda `
   --artifacts $run `
-  --model-id $model `
-  --model-revision $revision `
+  --model-profile nemotron-nano-8b `
   --run
 ```
 
 This remains local PEFT training. It does not call the separately documented Foundry
 managed-compute deployment. Use a fresh artifact root per model/configuration.
+
+For an unlisted model, select `--model-profile custom` and provide `--model-id`,
+`--model-revision` and `--target-modules`. Start with a smoke run. A generic Hugging Face
+repository is not automatically compatible merely because it is open weight.
 
 ## Outputs and checks
 

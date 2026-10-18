@@ -5,13 +5,11 @@ import json
 import shlex
 from pathlib import Path
 
-from email_workshop.data import (
-    ADAPTERS,
-    MODEL_ID,
-    MODEL_REVISION,
-    load_splits,
-    prepare,
-    write_json,
+from email_workshop.data import ADAPTERS, load_splits, prepare, write_json
+from email_workshop.model_profiles import (
+    DEFAULT_MODEL_PROFILE,
+    model_profile_keys,
+    resolve_model_profile,
 )
 
 
@@ -29,8 +27,12 @@ def main() -> None:
     training.add_argument("--epochs", type=float, default=2.0)
     training.add_argument("--max-steps", type=int, default=-1)
     training.add_argument("--sample-limit", type=int)
-    training.add_argument("--model-id", default=MODEL_ID)
-    training.add_argument("--model-revision", default=MODEL_REVISION)
+    training.add_argument(
+        "--model-profile", choices=model_profile_keys(), default=DEFAULT_MODEL_PROFILE
+    )
+    training.add_argument("--model-id")
+    training.add_argument("--model-revision")
+    training.add_argument("--target-modules", nargs="+")
     evaluation = commands.add_parser("evaluate")
     evaluation.add_argument("--backend", choices=("peft", "vllm"), default="peft")
     evaluation.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
@@ -61,9 +63,17 @@ def main() -> None:
     elif args.command == "train":
         from email_workshop.training import TrainConfig, train_adapter
 
-        config = TrainConfig(
+        profile = resolve_model_profile(
+            args.model_profile,
             model_id=args.model_id,
-            model_revision=args.model_revision,
+            revision=args.model_revision,
+            target_modules=tuple(args.target_modules) if args.target_modules else None,
+        )
+        config = TrainConfig(
+            model_profile=profile.key,
+            model_id=profile.model_id,
+            model_revision=profile.revision,
+            target_modules=profile.target_modules,
             device=args.device,
             epochs=args.epochs,
             max_steps=args.max_steps,

@@ -9,19 +9,25 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from email_workshop.data import (
-    ADAPTERS,
-    MODEL_ID,
-    MODEL_REVISION,
-    load_splits,
-    prepare,
-    write_json,
-)
+from email_workshop.data import ADAPTERS, load_splits, prepare, write_json
 from email_workshop.evaluation import STRATEGIES, evaluate, lexical_predictions, score
+from email_workshop.model_profiles import (
+    DEFAULT_MODEL_PROFILE,
+    MODEL_PROFILES,
+    model_profile_keys,
+    resolve_model_profile,
+)
 from email_workshop.routing import fit_router
-from email_workshop.training import LocalBackend, TrainConfig, train_adapter, verify_adapters
+from email_workshop.training import (
+    LocalBackend,
+    TrainConfig,
+    train_adapter,
+    train_config_dict,
+    verify_adapters,
+)
 
 STAGES = ("prepare", "router", "train", "evaluate")
+DEFAULT_PROFILE = MODEL_PROFILES[DEFAULT_MODEL_PROFILE]
 
 
 @dataclass(frozen=True)
@@ -29,8 +35,10 @@ class PipelineConfig:
     root: Path
     profile: str
     device: str
-    model_id: str = MODEL_ID
-    model_revision: str = MODEL_REVISION
+    model_profile: str = DEFAULT_PROFILE.key
+    model_id: str = DEFAULT_PROFILE.model_id
+    model_revision: str = DEFAULT_PROFILE.revision
+    target_modules: tuple[str, ...] = DEFAULT_PROFILE.target_modules
     seed: int = 2026
     target_recall: float = 0.95
     epochs: float = 2.0
@@ -45,8 +53,13 @@ class PipelineConfig:
             raise ValueError("profile must be smoke or full.")
         if self.device not in ("cpu", "cuda"):
             raise ValueError("device must be cpu or cuda.")
-        if not self.model_id.strip() or not self.model_revision.strip():
-            raise ValueError("model_id and model_revision must not be empty.")
+        if (
+            not self.model_profile.strip()
+            or not self.model_id.strip()
+            or not self.model_revision.strip()
+            or not self.target_modules
+        ):
+            raise ValueError("Complete model profile configuration is required.")
         if not 0 < self.target_recall <= 1:
             raise ValueError("target_recall must be in (0, 1].")
         if self.epochs <= 0:
@@ -68,18 +81,30 @@ class PipelineConfig:
 def resolved_config(args: argparse.Namespace) -> PipelineConfig:
     profile = args.profile
     root = args.artifacts or Path(f"artifacts/pipeline-{profile}")
+    model = resolve_model_profile(
+        args.model_profile,
+        model_id=args.model_id,
+        revision=args.model_revision,
+        target_modules=tuple(args.target_modules) if args.target_modules else None,
+    )
     return PipelineConfig(
         root=root.resolve(),
         profile=profile,
         device=args.device or ("cpu" if profile == "smoke" else "cuda"),
-        model_id=args.model_id,
-        model_revision=args.model_revision,
+        model_profile=model.key,
+        model_id=model.model_id,
+        model_revision=model.revision,
+        target_modules=model.target_modules,
         seed=args.seed,
         target_recall=args.target_recall,
         epochs=args.epochs,
-        max_steps=args.max_steps if args.max_steps is not None else (2 if profile == "smoke" else -1),
+        max_steps=args.max_steps
+        if args.max_steps is not None
+        else (2 if profile == "smoke" else -1),
         sample_limit=(
-            args.sample_limit if args.sample_limit is not None else (16 if profile == "smoke" else None)
+            args.sample_limit
+            if args.sample_limit is not None
+            else (16 if profile == "smoke" else None)
         ),
         evaluation_limit=(
             args.evaluation_limit
@@ -93,6 +118,7 @@ def resolved_config(args: argparse.Namespace) -> PipelineConfig:
 
 def public_config(config: PipelineConfig) -> dict[str, Any]:
     value = asdict(config)
+    value["target_modules"] = list(config.target_modules)
     value["root"] = str(config.root)
     value["source"] = str(config.source) if config.source else None
     return value
@@ -108,6 +134,12 @@ def update_status(config: PipelineConfig, stages: dict[str, dict[str, Any]]) -> 
         {
             "profile": config.profile,
             "device": config.device,
+            "model": {
+                "profile": config.model_profile,
+                "id": config.model_id,
+                "revision": config.model_revision,
+                "targetModules": list(config.target_modules),
+            },
             "updated_at": datetime.now(UTC).isoformat(),
             "stages": stages,
         },
@@ -128,13 +160,18 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     if (config.root / "data" / "manifest.json").exists():
         splits, manifest = load_splits(config.root)
         if manifest["seed"] != config.seed:
-            raise ValueError("Existing dataset seed differs from the pipeline plan; use a new root.")
+            raise ValueError(
+                "Existing dataset seed differs from the pipeline plan; use a new root."
+            )
         if config.source is not None and manifest["dataset"] != "local":
             raise ValueError("Existing data did not come from the requested local source.")
-        if config.source is not None and hashlib.sha256(config.source.read_bytes()).hexdigest() != manifest[
-            "source_sha256"
-        ]:
-            raise ValueError("Existing data differs from the requested local source; use a new root.")
+        if (
+            config.source is not None
+            and hashlib.sha256(config.source.read_bytes()).hexdigest() != manifest["source_sha256"]
+        ):
+            raise ValueError(
+                "Existing data differs from the requested local source; use a new root."
+            )
         complete(
             "prepare",
             reused=True,
@@ -157,9 +194,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     if router_metadata["target_recall"] != config.target_recall:
         raise ValueError("Existing router target differs from the pipeline plan; use a new root.")
     splits, _ = load_splits(config.root)
-    lexical_summary, lexical_per_label = score(
-        lexical_predictions(splits["validation"], router)
-    )
+    lexical_summary, lexical_per_label = score(lexical_predictions(splits["validation"], router))
     write_json(
         config.root / "router" / "validation_metrics.json",
         {"summary": lexical_summary, "per_label": lexical_per_label},
@@ -173,8 +208,10 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
 
     emit("stage_started", stage="train")
     train_config = TrainConfig(
+        model_profile=config.model_profile,
         model_id=config.model_id,
         model_revision=config.model_revision,
+        target_modules=config.target_modules,
         seed=config.seed,
         device=config.device,
         epochs=config.epochs,
@@ -198,7 +235,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         trained.append(adapter)
         emit("adapter_completed", adapter=adapter)
     manifests = verify_adapters(config.root)
-    expected_training_config = asdict(train_config)
+    expected_training_config = train_config_dict(train_config)
     if any(item["config"] != expected_training_config for item in manifests.values()):
         raise ValueError("Existing adapter configuration differs from the pipeline plan.")
     purposes = sorted({item["purpose"] for item in manifests.values()})
@@ -223,9 +260,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         comparison: dict[str, Any] = {}
         for strategy in STRATEGIES:
             emit("evaluation_started", split=split_name, strategy=strategy, rows=len(rows))
-            output = (
-                config.root / "evaluation" / f"peft-{split_name}-{strategy}.json"
-            )
+            output = config.root / "evaluation" / f"peft-{split_name}-{strategy}.json"
             predictions = evaluate(
                 rows,
                 backend,
@@ -255,6 +290,12 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "status": "completed",
         "profile": config.profile,
         "device": config.device,
+        "model": {
+            "profile": config.model_profile,
+            "id": config.model_id,
+            "revision": config.model_revision,
+            "targetModules": list(config.target_modules),
+        },
         "artifacts": str(config.root),
         "stages": stages,
         "evaluation": evaluation,
@@ -271,8 +312,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--artifacts", type=Path)
     parser.add_argument("--profile", choices=("smoke", "full"), required=True)
     parser.add_argument("--device", choices=("cpu", "cuda"))
-    parser.add_argument("--model-id", default=MODEL_ID)
-    parser.add_argument("--model-revision", default=MODEL_REVISION)
+    parser.add_argument(
+        "--model-profile", choices=model_profile_keys(), default=DEFAULT_MODEL_PROFILE
+    )
+    parser.add_argument("--model-id")
+    parser.add_argument("--model-revision")
+    parser.add_argument("--target-modules", nargs="+")
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--target-recall", type=float, default=0.95)
     parser.add_argument("--epochs", type=float, default=2.0)
