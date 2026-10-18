@@ -111,3 +111,18 @@ synthetic live smoke tests, costs, and cleanup.
 - **55 tests passed**, including cloud, pipeline, notebook-cleanliness, and new portability checks.
   Ruff passed for the changed Python files. The earlier notebook-cleanliness failure is resolved.
 - No live Azure deployment, GPU training, or model call was performed for this change.
+
+## Dedicated Nemotron managed-compute scaffold (2026-10-17)
+
+- Added separate Foundry account/project and `GlobalManagedCompute` Bicep templates,
+  environment template, approval-gated deployment helper, and developer/agent guides.
+- **70 tests passed**, with one optional training module skipped; Ruff passed across
+  workshop sources, tests and scripts.
+- Model Bicep and parameter wiring compiled using synthetic configuration. Bicep 0.44.1
+  emits `BCP081` because it has no local type metadata for
+  `managedComputeDeployments@2026-07-15-preview`; the properties follow the published ARM
+  reference, but service-side acceptance was not tested.
+- No live availability/quota/capacity checks, resource creation, model inference, automatic
+  license acceptance, key retrieval or credential changes were performed.
+- Model compute has a separate lifecycle and potential idle GPU charges from Container Apps.
+  See [the model deployment guide](docs/FOUNDRY_MODEL_DEPLOYMENT.md).

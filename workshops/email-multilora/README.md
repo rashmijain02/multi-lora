@@ -9,6 +9,11 @@ an existing compatible Foundry endpoint; it does not replace local LoRA training
 that remote prompting uses trained adapters. Configuration lives in an ignored `.env`;
 only the placeholder `.env.example` is intended for Git.
 
+Need to provision Nemotron itself first? Use the separate
+[Foundry model deployment guide](docs/FOUNDRY_MODEL_DEPLOYMENT.md), which includes Bicep for
+a dedicated account/project and parameterized managed-compute model deployment.
+The model's preview GPU quota and billing are separate from API hosting.
+
 Start with [01: data and routing](notebooks/01_email_data_and_routing.ipynb), then [02: train adapters](notebooks/02_train_email_adapters.ipynb), and [03: compare and serve](notebooks/03_compare_and_serve.ipynb).
 
 The notebooks match the CLM examples' structure: a primary question, evaluation contract, secure configuration, explicit execution gates, data checks, tables/charts, prediction artifacts, and interpretation checklists. They use a separate package and environment; nothing in CLM is modified.

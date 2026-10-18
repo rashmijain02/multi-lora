@@ -16,6 +16,12 @@ This project does not provision Nemotron, accept marketplace terms, or assume th
 can load the workshop's Qwen adapters. If your deployment has a different protocol, do not guess a
 URL or silently substitute a model: adapt/test the client explicitly first.
 
+If you do not have a model endpoint yet, use the separate
+[Foundry model deployment guide](FOUNDRY_MODEL_DEPLOYMENT.md) and
+[model agent runbook](FOUNDRY_MODEL_AGENT.md). That path provisions a dedicated Foundry
+account/project and preview managed GPU deployment before you configure this API.
+Its model compute can incur charges independently of Container Apps.
+
 Reference: [Foundry v1 API and model support](https://learn.microsoft.com/azure/foundry/openai/api-version-lifecycle).
 v1 URLs normally end in `/openai/v1/chat/completions` with no API version. Other compatible
 deployments may need `FOUNDRY_API_VERSION`; it is sent as the `api-version` query parameter.
