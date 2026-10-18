@@ -109,6 +109,7 @@ def test_train_save_load_switch_and_manifest(prepared, tiny_base, monkeypatch):
     base, _ = tiny_base
     torch.set_num_threads(2)
     config = TrainConfig(
+        model_profile="custom",
         model_id=str(base),
         model_revision="local-test",
         device="cpu",

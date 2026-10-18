@@ -2,8 +2,9 @@
 
 All examples start at the `multi-lora` repository root and then enter the workshop.
 No Azure account, endpoint, `.env`, or paid cloud resource is needed. This path downloads
-the public pinned dataset and Qwen2.5-0.5B model, trains four local LoRA adapters, and
-evaluates them locally. It does **not** train Nemotron or call Foundry.
+the public pinned dataset and the open-weight model selected by a pinned profile, trains four
+local LoRA adapters, and evaluates them locally. It does not call Foundry. The accessible
+default is Qwen2.5-0.5B; the locally validated larger option is Nemotron Nano 8B.
 
 ## Requirements
 
@@ -118,6 +119,31 @@ On Linux, use `.venv/bin/python` with the same CLI arguments. Freeze configurati
 validation decisions before running the final `--split test` comparison. Do not repeatedly
 tune against the test split. Full evaluation time depends on generation lengths and the GPU;
 no runtime or quality improvement is guaranteed.
+
+### Run the same cycle with another compatible base
+
+Both the individual `train` command and staged pipeline use model profiles. Verify the
+architecture, license, chat template, target modules and hardware fit before a full run.
+Never use a floating model revision for a comparison.
+
+Example using the locally validated NVIDIA model:
+
+```powershell
+$run = 'artifacts/nemotron-nano-8b-full-20261018'
+& $python -m email_workshop.pipeline `
+  --profile full `
+  --device cuda `
+  --artifacts $run `
+  --model-profile nemotron-nano-8b `
+  --run
+```
+
+This remains local PEFT training. It does not call the separately documented Foundry
+managed-compute deployment. Use a fresh artifact root per model/configuration.
+
+For an unlisted model, select `--model-profile custom` and provide `--model-id`,
+`--model-revision` and `--target-modules`. Start with a smoke run. A generic Hugging Face
+repository is not automatically compatible merely because it is open weight.
 
 ## Outputs and checks
 
