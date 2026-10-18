@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "email-multilora-workshop"
+version = "0.1.0"
+description = "Leakage-aware, multi-label email LoRA training and routing workshop"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "huggingface-hub>=0.35,<1",
+  "iterative-stratification==0.1.9",
+  "matplotlib>=3.9,<4",
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+  "requests>=2.32,<3",
+  "scikit-learn>=1.5,<2",
+  "ipykernel>=6.29,<8",
+]
+
+[project.optional-dependencies]
+cloud = [
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
+  "python-dotenv>=1,<2",
+]
+training = [
+  "torch==2.10.0",
+  "transformers==4.57.6",
+  "peft==0.18.1",
+  "accelerate==1.12.0",
+  "trackio==0.7.0",
+]
+dev = ["pytest>=8,<10", "nbformat>=5.10,<6", "nbclient>=0.10,<1", "ruff>=0.15,<1", "httpx>=0.28,<1"]
+
+[project.scripts]
+email-workshop = "email_workshop.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["email_workshop*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["training: requires the optional training dependencies"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
