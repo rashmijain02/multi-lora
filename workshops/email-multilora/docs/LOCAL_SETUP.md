@@ -119,6 +119,30 @@ validation decisions before running the final `--split test` comparison. Do not 
 tune against the test split. Full evaluation time depends on generation lengths and the GPU;
 no runtime or quality improvement is guaranteed.
 
+### Run the same cycle with another compatible base
+
+Both the individual `train` command and staged pipeline accept an explicit, immutable
+model ID/revision. Verify the architecture, license, chat template, target modules and
+hardware fit before a full run. Never use a floating model revision for a comparison.
+
+Example using the locally validated NVIDIA model:
+
+```powershell
+$model = 'nvidia/Llama-3.1-Nemotron-Nano-8B-v1'
+$revision = '54641c1611fcff44fa4865626462445e0a153fc7'
+$run = 'artifacts/nemotron-nano-8b-full-20261018'
+& $python -m email_workshop.pipeline `
+  --profile full `
+  --device cuda `
+  --artifacts $run `
+  --model-id $model `
+  --model-revision $revision `
+  --run
+```
+
+This remains local PEFT training. It does not call the separately documented Foundry
+managed-compute deployment. Use a fresh artifact root per model/configuration.
+
 ## Outputs and checks
 
 Within each ignored run directory:

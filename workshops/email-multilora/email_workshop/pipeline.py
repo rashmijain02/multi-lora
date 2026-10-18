@@ -9,7 +9,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from email_workshop.data import ADAPTERS, load_splits, prepare, write_json
+from email_workshop.data import (
+    ADAPTERS,
+    MODEL_ID,
+    MODEL_REVISION,
+    load_splits,
+    prepare,
+    write_json,
+)
 from email_workshop.evaluation import STRATEGIES, evaluate, lexical_predictions, score
 from email_workshop.routing import fit_router
 from email_workshop.training import LocalBackend, TrainConfig, train_adapter, verify_adapters
@@ -22,6 +29,8 @@ class PipelineConfig:
     root: Path
     profile: str
     device: str
+    model_id: str = MODEL_ID
+    model_revision: str = MODEL_REVISION
     seed: int = 2026
     target_recall: float = 0.95
     epochs: float = 2.0
@@ -36,6 +45,8 @@ class PipelineConfig:
             raise ValueError("profile must be smoke or full.")
         if self.device not in ("cpu", "cuda"):
             raise ValueError("device must be cpu or cuda.")
+        if not self.model_id.strip() or not self.model_revision.strip():
+            raise ValueError("model_id and model_revision must not be empty.")
         if not 0 < self.target_recall <= 1:
             raise ValueError("target_recall must be in (0, 1].")
         if self.epochs <= 0:
@@ -61,6 +72,8 @@ def resolved_config(args: argparse.Namespace) -> PipelineConfig:
         root=root.resolve(),
         profile=profile,
         device=args.device or ("cpu" if profile == "smoke" else "cuda"),
+        model_id=args.model_id,
+        model_revision=args.model_revision,
         seed=args.seed,
         target_recall=args.target_recall,
         epochs=args.epochs,
@@ -160,6 +173,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
 
     emit("stage_started", stage="train")
     train_config = TrainConfig(
+        model_id=config.model_id,
+        model_revision=config.model_revision,
         seed=config.seed,
         device=config.device,
         epochs=config.epochs,
@@ -256,6 +271,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--artifacts", type=Path)
     parser.add_argument("--profile", choices=("smoke", "full"), required=True)
     parser.add_argument("--device", choices=("cpu", "cuda"))
+    parser.add_argument("--model-id", default=MODEL_ID)
+    parser.add_argument("--model-revision", default=MODEL_REVISION)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--target-recall", type=float, default=0.95)
     parser.add_argument("--epochs", type=float, default=2.0)

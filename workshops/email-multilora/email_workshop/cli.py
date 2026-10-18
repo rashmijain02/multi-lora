@@ -5,7 +5,14 @@ import json
 import shlex
 from pathlib import Path
 
-from email_workshop.data import ADAPTERS, load_splits, prepare, write_json
+from email_workshop.data import (
+    ADAPTERS,
+    MODEL_ID,
+    MODEL_REVISION,
+    load_splits,
+    prepare,
+    write_json,
+)
 
 
 def main() -> None:
@@ -22,6 +29,8 @@ def main() -> None:
     training.add_argument("--epochs", type=float, default=2.0)
     training.add_argument("--max-steps", type=int, default=-1)
     training.add_argument("--sample-limit", type=int)
+    training.add_argument("--model-id", default=MODEL_ID)
+    training.add_argument("--model-revision", default=MODEL_REVISION)
     evaluation = commands.add_parser("evaluate")
     evaluation.add_argument("--backend", choices=("peft", "vllm"), default="peft")
     evaluation.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
@@ -53,6 +62,8 @@ def main() -> None:
         from email_workshop.training import TrainConfig, train_adapter
 
         config = TrainConfig(
+            model_id=args.model_id,
+            model_revision=args.model_revision,
             device=args.device,
             epochs=args.epochs,
             max_steps=args.max_steps,

@@ -104,6 +104,26 @@ def test_full_plan_uses_separate_default_root(monkeypatch):
     assert config.evaluation_limit is None
 
 
+def test_model_override_is_preserved_in_plan(monkeypatch):
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "pipeline",
+            "--profile",
+            "smoke",
+            "--model-id",
+            "nvidia/example",
+            "--model-revision",
+            "immutable-revision",
+        ],
+    )
+
+    config = pipeline.resolved_config(pipeline.build_parser().parse_args())
+
+    assert config.model_id == "nvidia/example"
+    assert config.model_revision == "immutable-revision"
+
+
 def test_smoke_pipeline_runs_all_stages_and_writes_result(tmp_path, monkeypatch):
     calls = patch_pipeline_stages(monkeypatch)
     config = pipeline.PipelineConfig(
@@ -122,6 +142,11 @@ def test_smoke_pipeline_runs_all_stages_and_writes_result(tmp_path, monkeypatch)
     calls["prepare"].assert_called_once_with(config.root, 2026, None)
     calls["fit_router"].assert_called_once_with(config.root, 0.95)
     assert [call.args[1] for call in calls["train_adapter"].call_args_list] == list(ADAPTERS)
+    assert all(
+        call.args[2].model_id == config.model_id
+        and call.args[2].model_revision == config.model_revision
+        for call in calls["train_adapter"].call_args_list
+    )
     assert calls["evaluate"].call_count == 4
     assert {call.args[4] for call in calls["evaluate"].call_args_list} == set(
         pipeline.STRATEGIES
