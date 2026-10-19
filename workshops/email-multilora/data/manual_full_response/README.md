@@ -1,6 +1,6 @@
 # Current-agent manual response dataset
 
-This directory is a resumable, manually authored dataset produced by the current chat agent.
+This directory contains the completed, manually authored dataset produced by the current chat agent.
 No local language model, external endpoint, Python response generator, or persona template
 generator authors the response text.
 
@@ -9,8 +9,6 @@ generator authors the response text.
 - Source emails: 2,103
 - Assistants: ten fictional personas plus one generic baseline
 - Final authored replies: 23,133
-- Batch size: ten source emails (final batch has three)
-- Expected batches: 211
 
 Each final persona CSV has exactly the source schema plus one column:
 
@@ -26,17 +24,17 @@ dataset_revision
 personality_response
 ```
 
-## Process
+## Authorship and assembly
 
-1. Read the next ten source emails.
-2. Act as each persona and manually author one final reply per email.
-3. Record those 110 replies in a batch response ledger.
-4. Mechanically join the authored text to the unchanged source rows.
-5. Validate row counts, source-value preservation, assistant coverage, and non-empty replies.
-6. Update `progress.json`.
+Responses were authored from each source email and the corresponding persona specification.
+Temporary batch ledgers were used during generation and deleted after the final CSVs passed
+coverage and source-preservation checks.
 
 Mechanical CSV assembly is allowed only to avoid manually copying the same source email body
 eleven times. It does not generate, select, paraphrase, or modify reply text.
+
+`MANIFEST.json` records provenance, validation results, response statistics, file sizes, and
+SHA-256 checksums for the committed CSVs.
 
 ## Persona source
 
@@ -45,13 +43,7 @@ non-personalized control.
 
 ## Status
 
-See `progress.json`. This dataset is incomplete until all 211 batches are recorded as complete.
-
-`completed_source_rows` counts the contiguous source rows completed for **every** assistant. When
-one persona advances independently, `persona_completed_source_rows` records that persona's
-position without incorrectly marking the full eleven-assistant batch complete.
-
-Current persona coverage:
+All persona datasets are complete:
 
 - Maya Chen (CEO): 2,103 of 2,103.
 - Daniel Okafor (CFO): 2,103 of 2,103.
