@@ -12,3 +12,16 @@ __pycache__/
 .copilot-azure/
 workshops/email-multilora/artifacts/
 workshops/email-multilora/.cache/
+# Email workshop data is local by default.
+workshops/email-multilora/data/*
+
+# Durable persona specifications.
+!workshops/email-multilora/data/personalities/
+!workshops/email-multilora/data/personalities/*.md
+
+# Final reviewed response datasets and documentation.
+!workshops/email-multilora/data/manual_full_response/
+workshops/email-multilora/data/manual_full_response/*
+!workshops/email-multilora/data/manual_full_response/README.md
+!workshops/email-multilora/data/manual_full_response/MANIFEST.json
+!workshops/email-multilora/data/manual_full_response/[0-9][0-9]-*-email-responses.csv

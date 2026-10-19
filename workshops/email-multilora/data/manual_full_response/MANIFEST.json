@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "created_date": "2026-10-19",
+  "source": {
+    "dataset": "imnim/multiclass-email-classification",
+    "revision": "e95090f0bb6dae0b05c9cd6db314dcae1d40db3f",
+    "license_declared_by_publisher": "MIT",
+    "source_rows_after_quarantine": 2103
+  },
+  "authorship": {
+    "method": "Responses authored by the current chat agent and background agents from each source email and persona specification.",
+    "external_generation_endpoints_used": false,
+    "local_language_models_used": false,
+    "algorithmic_response_templates_used": false,
+    "assembly": "CSV joining, validation, and checksums were deterministic; scripts did not author response text."
+  },
+  "dataset": {
+    "assistants": 11,
+    "rows_per_assistant": 2103,
+    "total_response_rows": 23133,
+    "schema": [
+      "id",
+      "split",
+      "subject",
+      "body",
+      "labels_json",
+      "label_count",
+      "dataset",
+      "dataset_revision",
+      "personality_response"
+    ],
+    "persona_profiles": [
+      "01-maya-chen-ceo.md",
+      "02-daniel-okafor-cfo.md",
+      "03-priya-raman-l1-support-specialist.md",
+      "04-lucas-silva-software-engineer.md",
+      "05-amina-yusuf-sales-account-executive.md",
+      "06-jordan-lee-people-operations-manager.md",
+      "07-elena-petrova-marketing-director.md",
+      "08-marcus-green-legal-compliance-counsel.md",
+      "09-sofia-alvarez-operations-manager.md",
+      "10-noah-williams-executive-assistant.md"
+    ],
+    "generic_baseline_specification": "README.md"
+  },
+  "validation": {
+    "unique_ids_per_file": 2103,
+    "canonical_id_order_matches_across_files": true,
+    "source_columns_preserved": true,
+    "empty_responses": 0,
+    "forbidden_bracket_tags": 0,
+    "generic_regarding_shells": 0,
+    "unicode_replacement_characters": 0
+  },
+  "files": [
+    {
+      "path": "01-maya-chen-ceo-email-responses.csv",
+      "persona_id": "ceo",
+      "rows": 2103,
+      "bytes": 1629544,
+      "sha256": "576d403752315f569b83071be06ba881508e16165f360ee50d03acfd97287e6d",
+      "unique_responses": 2093,
+      "exact_duplicate_rows": 10,
+      "response_words": {
+        "minimum": 5,
+        "median": 21,
+        "maximum": 36
+      }
+    },
+    {
+      "path": "02-daniel-okafor-cfo-email-responses.csv",
+      "persona_id": "cfo",
+      "rows": 2103,
+      "bytes": 1657350,
+      "sha256": "19cc49c1008664f2a7d374f79e9e657837e6abb31e251fe12f5b1e6b04a16db0",
+      "unique_responses": 1864,
+      "exact_duplicate_rows": 239,
+      "response_words": {
+        "minimum": 9,
+        "median": 21,
+        "maximum": 43
+      }
+    },
+    {
+      "path": "03-priya-raman-l1-support-specialist-email-responses.csv",
+      "persona_id": "support",
+      "rows": 2103,
+      "bytes": 1675257,
+      "sha256": "3fb064fba42aad6ec157bc506903f7411fe35dcbdf6980452a6a178de8f9b990",
+      "unique_responses": 2101,
+      "exact_duplicate_rows": 2,
+      "response_words": {
+        "minimum": 11,
+        "median": 24,
+        "maximum": 52
+      }
+    },
+    {
+      "path": "04-lucas-silva-software-engineer-email-responses.csv",
+      "persona_id": "engineer",
+      "rows": 2103,
+      "bytes": 1682446,
+      "sha256": "556ccabef28778ec4948a8b52a6ea36039bbb93ecf8c6a48a0aabdfee34b0700",
+      "unique_responses": 2102,
+      "exact_duplicate_rows": 1,
+      "response_words": {
+        "minimum": 7,
+        "median": 23,
+        "maximum": 48
+      }
+    },
+    {
+      "path": "05-amina-yusuf-sales-account-executive-email-responses.csv",
+      "persona_id": "sales",
+      "rows": 2103,
+      "bytes": 1631095,
+      "sha256": "1701b7b895127a321ed66bf92e11f95d84cf638ee399b7cae08488094a61051e",
+      "unique_responses": 2102,
+      "exact_duplicate_rows": 1,
+      "response_words": {
+        "minimum": 12,
+        "median": 21,
+        "maximum": 36
+      }
+    },
+    {
+      "path": "06-jordan-lee-people-operations-manager-email-responses.csv",
+      "persona_id": "people-ops",
+      "rows": 2103,
+      "bytes": 1673065,
+      "sha256": "84f3bab6d24bf2bd2a70c2bbf6d2a2ff4448cfd1cffbb2e6edb42177ebde72c1",
+      "unique_responses": 1926,
+      "exact_duplicate_rows": 177,
+      "response_words": {
+        "minimum": 9,
+        "median": 23,
+        "maximum": 43
+      }
+    },
+    {
+      "path": "07-elena-petrova-marketing-director-email-responses.csv",
+      "persona_id": "marketing",
+      "rows": 2103,
+      "bytes": 1718371,
+      "sha256": "170360169f066efe64d4bb93019529415b660f83e563ea948ad4c98d9caa064d",
+      "unique_responses": 2101,
+      "exact_duplicate_rows": 2,
+      "response_words": {
+        "minimum": 13,
+        "median": 27,
+        "maximum": 43
+      }
+    },
+    {
+      "path": "08-marcus-green-legal-compliance-counsel-email-responses.csv",
+      "persona_id": "legal",
+      "rows": 2103,
+      "bytes": 1683846,
+      "sha256": "acf8d421de2b0859e25fcc8472bb03512ce8278921dfe09ceeaf9144fe618897",
+      "unique_responses": 2099,
+      "exact_duplicate_rows": 4,
+      "response_words": {
+        "minimum": 12,
+        "median": 21,
+        "maximum": 45
+      }
+    },
+    {
+      "path": "09-sofia-alvarez-operations-manager-email-responses.csv",
+      "persona_id": "operations",
+      "rows": 2103,
+      "bytes": 1693176,
+      "sha256": "e771c0b0d911300601f03b671e95ba84ea5803c78fe3f6f7cd7653cbc3b81b9b",
+      "unique_responses": 2026,
+      "exact_duplicate_rows": 77,
+      "response_words": {
+        "minimum": 9,
+        "median": 25,
+        "maximum": 48
+      }
+    },
+    {
+      "path": "10-noah-williams-executive-assistant-email-responses.csv",
+      "persona_id": "executive-assistant",
+      "rows": 2103,
+      "bytes": 1720833,
+      "sha256": "c3ed938030c9aa7636e73843e8785ec10797d3d7491039550b95d4cf429b2d79",
+      "unique_responses": 2075,
+      "exact_duplicate_rows": 28,
+      "response_words": {
+        "minimum": 12,
+        "median": 28,
+        "maximum": 48
+      }
+    },
+    {
+      "path": "11-generic-assistant-baseline-email-responses.csv",
+      "persona_id": "generic",
+      "rows": 2103,
+      "bytes": 1678394,
+      "sha256": "f251cdecf9013ebb9f27f9fe50f988089925ed294091aa9d960c2479a8bff6ee",
+      "unique_responses": 2093,
+      "exact_duplicate_rows": 10,
+      "response_words": {
+        "minimum": 10,
+        "median": 25,
+        "maximum": 37
+      }
+    }
+  ]
+}
