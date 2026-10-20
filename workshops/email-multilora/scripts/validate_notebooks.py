@@ -34,8 +34,18 @@ def main() -> None:
                             in {
                                 "RUN_TRAINING",
                                 "RUN_EVALUATION",
+                                "RUN_FINAL_TEST",
+                                "RUN_FULL_VALIDATION",
+                                "RUN_EMBEDDING_METRICS",
+                                "EXPORT_HUMAN_REVIEW",
+                                "EXPORT_LLM_JUDGE_PROMPTS",
+                                "RUN_ROBUSTNESS_GENERATION",
                                 "RUN_VLLM_DEMO",
+                                "RUN_VLLM_COMMAND",
                                 "RUN_TOKENIZATION_CHECK",
+                                "SHOW_PROFILE_PROMPT",
+                                "SHOW_RESPONSE_SAMPLES",
+                                "SHOW_EMAIL_TEXT",
                             }
                             and not (
                                 isinstance(node.value, ast.Constant) and node.value.value is False

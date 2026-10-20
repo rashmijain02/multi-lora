@@ -1,0 +1,72 @@
+{
+  "maya-chen-ceo": {
+    "name": "Maya Chen",
+    "role": "Chief Executive Officer",
+    "adapter": "maya-chen",
+    "profile_file": "data/personalities/01-maya-chen-ceo.md",
+    "data_file": "data/manual_full_response/01-maya-chen-ceo-email-responses.csv"
+  },
+  "daniel-okafor-cfo": {
+    "name": "Daniel Okafor",
+    "role": "Chief Financial Officer",
+    "adapter": "daniel-okafor",
+    "profile_file": "data/personalities/02-daniel-okafor-cfo.md",
+    "data_file": "data/manual_full_response/02-daniel-okafor-cfo-email-responses.csv"
+  },
+  "priya-raman-support": {
+    "name": "Priya Raman",
+    "role": "L1 Customer Support Specialist",
+    "adapter": "priya-raman",
+    "profile_file": "data/personalities/03-priya-raman-l1-support-specialist.md",
+    "data_file": "data/manual_full_response/03-priya-raman-l1-support-specialist-email-responses.csv"
+  },
+  "lucas-silva-engineer": {
+    "name": "Lucas Silva",
+    "role": "Software Engineer",
+    "adapter": "lucas-silva",
+    "profile_file": "data/personalities/04-lucas-silva-software-engineer.md",
+    "data_file": "data/manual_full_response/04-lucas-silva-software-engineer-email-responses.csv"
+  },
+  "amina-yusuf-sales": {
+    "name": "Amina Yusuf",
+    "role": "Sales Account Executive",
+    "adapter": "amina-yusuf",
+    "profile_file": "data/personalities/05-amina-yusuf-sales-account-executive.md",
+    "data_file": "data/manual_full_response/05-amina-yusuf-sales-account-executive-email-responses.csv"
+  },
+  "jordan-lee-people-ops": {
+    "name": "Jordan Lee",
+    "role": "People Operations Manager",
+    "adapter": "jordan-lee",
+    "profile_file": "data/personalities/06-jordan-lee-people-operations-manager.md",
+    "data_file": "data/manual_full_response/06-jordan-lee-people-operations-manager-email-responses.csv"
+  },
+  "elena-petrova-marketing": {
+    "name": "Elena Petrova",
+    "role": "Marketing Director",
+    "adapter": "elena-petrova",
+    "profile_file": "data/personalities/07-elena-petrova-marketing-director.md",
+    "data_file": "data/manual_full_response/07-elena-petrova-marketing-director-email-responses.csv"
+  },
+  "marcus-green-legal": {
+    "name": "Marcus Green",
+    "role": "Legal and Compliance Counsel",
+    "adapter": "marcus-green",
+    "profile_file": "data/personalities/08-marcus-green-legal-compliance-counsel.md",
+    "data_file": "data/manual_full_response/08-marcus-green-legal-compliance-counsel-email-responses.csv"
+  },
+  "sofia-alvarez-operations": {
+    "name": "Sofia Alvarez",
+    "role": "Business Operations Manager",
+    "adapter": "sofia-alvarez",
+    "profile_file": "data/personalities/09-sofia-alvarez-operations-manager.md",
+    "data_file": "data/manual_full_response/09-sofia-alvarez-operations-manager-email-responses.csv"
+  },
+  "noah-williams-assistant": {
+    "name": "Noah Williams",
+    "role": "Executive Assistant and Travel Coordinator",
+    "adapter": "noah-williams",
+    "profile_file": "data/personalities/10-noah-williams-executive-assistant.md",
+    "data_file": "data/manual_full_response/10-noah-williams-executive-assistant-email-responses.csv"
+  }
+}

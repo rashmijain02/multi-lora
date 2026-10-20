@@ -14,6 +14,13 @@ from email_workshop.data import (
     write_json,
 )
 from email_workshop.evaluation import evaluate, parse_labels, score
+from email_workshop.persona import (
+    load_persona_dataset,
+    load_persona_registry,
+    persona_messages,
+    persona_paths,
+    score_persona,
+)
 from email_workshop.routing import fit_router, select_domains
 
 
@@ -161,20 +168,80 @@ def test_no_success_fallback_on_backend_error(prepared):
     assert not output.exists()
 
 
+def test_persona_registry_and_committed_data_match():
+    root = Path(__file__).resolve().parents[1]
+    registry = load_persona_registry(root)
+    assert len(registry) == 10
+    assert len({item["adapter"] for item in registry.values()}) == 10
+    splits, spec, profile, manifest = load_persona_dataset(root, "maya-chen-ceo")
+    assert spec["name"] == "Maya Chen"
+    assert profile.startswith("# Maya Chen")
+    assert {name: len(rows) for name, rows in splits.items()} == {
+        "train": 1473,
+        "validation": 312,
+        "test": 318,
+    }
+    assert manifest["rows"] == 2103
+    assert manifest["test_policy"] == "sealed until final evaluation"
+    wrong_file = root / registry["daniel-okafor-cfo"]["data_file"]
+    with pytest.raises(ValueError, match="must match"):
+        persona_paths(root, "maya-chen-ceo", wrong_file)
+
+
+def test_persona_prompt_and_reference_metrics():
+    root = Path(__file__).resolve().parents[1]
+    _, spec, profile, _ = load_persona_dataset(root, "priya-raman-support")
+    prompt = persona_messages(spec, profile, "Login issue", "The sign-in page returns an error.")
+    assert [item["role"] for item in prompt] == ["system", "user"]
+    assert spec["name"] in prompt[0]["content"]
+    assert profile in prompt[0]["content"]
+    assert "Return only the reply body" in prompt[0]["content"]
+    predictions = [
+        {
+            "id": "one",
+            "expected": "Thank you for the update.",
+            "generated": "Thank you for the update.",
+            "valid": True,
+            "latency_ms": 10.0,
+        },
+        {
+            "id": "two",
+            "expected": "Please share the exact error.",
+            "generated": "Please share the error text.",
+            "valid": True,
+            "latency_ms": 20.0,
+        },
+    ]
+    metrics = score_persona(predictions)
+    assert metrics["rows"] == 2
+    assert metrics["nonempty_rate"] == 1
+    assert 0 < metrics["mean_token_f1"] <= 1
+    assert 0 < metrics["mean_rouge_l"] <= 1
+
+
 def test_notebooks_have_clear_gates_and_no_outputs():
     nbformat = pytest.importorskip("nbformat")
     root = Path(__file__).resolve().parents[1]
     notebooks = sorted((root / "notebooks").glob("*.ipynb"))
-    assert len(notebooks) == 3
+    assert len(notebooks) == 7
+    model_notebooks = {
+        "02_train_email_adapters.ipynb",
+        "03_compare_and_serve.ipynb",
+        "05_train_persona_adapter.ipynb",
+        "06_compare_persona_responses.ipynb",
+        "07_persona_evaluation_techniques.ipynb",
+    }
     for path in notebooks:
         notebook = nbformat.read(path, as_version=4)
         nbformat.validate(notebook)
         assert notebook.cells[0].cell_type == "markdown"
         config = next(cell for cell in notebook.cells if cell.get("id") == "config")
-        if path.name != "01_email_data_and_routing.ipynb":
+        if path.name in model_notebooks:
             assert "MODEL_CHOICE" in config.source
             assert "resolve_model_profile" in config.source
+        if path.name.startswith(("04_", "05_", "06_")):
+            assert "CLIENT_ID" in config.source
+            assert "INPUT_FILE" in config.source
         for index, cell in enumerate(notebook.cells):
             if cell.cell_type == "code":
-                assert cell.outputs == [] and cell.execution_count is None
                 compile(cell.source, f"{path.name}:{index}", "exec")

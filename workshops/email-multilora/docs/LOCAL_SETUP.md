@@ -4,7 +4,9 @@ All examples start at the `multi-lora` repository root and then enter the worksh
 No Azure account, endpoint, `.env`, or paid cloud resource is needed. This path downloads
 the public pinned dataset and the open-weight model selected by a pinned profile, trains four
 local LoRA adapters, and evaluates them locally. It does not call Foundry. The accessible
-default is Qwen2.5-0.5B; the locally validated larger option is Nemotron Nano 8B.
+default is Qwen2.5-0.5B. Nemotron Nano 8B is an optional NVIDIA study profile; review
+[its LoRA, NIM, prompt-contract, and 24 GB GPU constraints](NEMOTRON_LORA_FINDINGS.md)
+before enabling it.
 
 ## Requirements
 

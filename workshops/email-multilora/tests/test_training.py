@@ -1,5 +1,6 @@
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -14,6 +15,13 @@ from transformers import PreTrainedTokenizerFast, Qwen2Config, Qwen2ForCausalLM
 
 from email_workshop.data import ADAPTERS, load_splits
 from email_workshop.evaluation import STRATEGIES, evaluate, score
+from email_workshop.persona import (
+    PersonaBackend,
+    persona_training_example,
+    persona_vllm_command,
+    train_persona_adapter,
+    verify_persona_adapter,
+)
 from email_workshop.routing import fit_router
 from email_workshop.serving import VllmBackend, concurrent_demo, vllm_command
 from email_workshop.training import (
@@ -80,7 +88,7 @@ def tiny_base(tmp_path):
             num_hidden_layers=1,
             num_attention_heads=2,
             num_key_value_heads=2,
-            max_position_embeddings=512,
+            max_position_embeddings=1024,
             eos_token_id=2,
             pad_token_id=1,
         )
@@ -103,6 +111,68 @@ def test_completion_mask_and_negative_specialist(tiny_base):
     batch = CompletionCollator(tokenizer.pad_token_id)([example, short])
     assert batch["labels"][1, -1].item() == -100
     assert batch["attention_mask"][1, -1].item() == 0
+
+
+def test_persona_completion_mask_preserves_reply(tiny_base):
+    _, tokenizer = tiny_base
+    spec = {
+        "name": "Test Person",
+        "role": "Test Role",
+        "adapter": "test-person",
+        "profile_file": "profile.md",
+        "data_file": "data.csv",
+    }
+    row = {
+        "id": "one",
+        "split": "train",
+        "subject": "subject",
+        "body": "body " * 1000,
+        "labels_json": '["Business"]',
+        "label_count": 1,
+        "dataset": "test",
+        "dataset_revision": "test",
+        "personality_response": "Please review details",
+    }
+    example = persona_training_example(tokenizer, row, spec, "Direct and concise.", 512)
+    targets = [token for token in example["labels"] if token != -100]
+    assert tokenizer.decode(targets, skip_special_tokens=True).replace(" ", "") == (
+        "Pleasereviewdetails"
+    )
+    assert example["labels"][0] == -100
+    assert len(example["input_ids"]) <= 512
+
+
+def test_persona_train_save_load_and_generate(tmp_path, tiny_base):
+    base, _ = tiny_base
+    workshop_root = Path(__file__).resolve().parents[1]
+    run_root = tmp_path / "persona-run"
+    torch.set_num_threads(2)
+    config = TrainConfig(
+        model_profile="custom",
+        model_id=str(base),
+        model_revision="local-test",
+        target_modules=("q_proj", "v_proj"),
+        device="cpu",
+        max_length=1024,
+        max_steps=1,
+        sample_limit=4,
+        gradient_accumulation=1,
+    )
+    manifest = train_persona_adapter(
+        run_root,
+        workshop_root,
+        "maya-chen-ceo",
+        config,
+    )
+    assert manifest["purpose"] == "smoke"
+    assert manifest["train_rows"] == 4
+    assert verify_persona_adapter(run_root, workshop_root, "maya-chen-ceo")["files"]
+    backend = PersonaBackend(run_root, workshop_root, "maya-chen-ceo", device="cpu")
+    assert isinstance(backend.generate("Review", "Please advise.", adapted=False), str)
+    assert isinstance(backend.generate("Review", "Please advise.", adapted=True), str)
+    command = persona_vllm_command(run_root, workshop_root, "artifacts/persona-run")
+    assert "--enable-lora" in command
+    assert any(item.startswith("maya-chen=") for item in command)
 
 
 def test_train_save_load_switch_and_manifest(prepared, tiny_base, monkeypatch):

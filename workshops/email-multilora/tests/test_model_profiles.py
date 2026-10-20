@@ -12,10 +12,12 @@ from email_workshop.training import TrainConfig, train_config_dict
 
 def test_default_profile_is_complete_and_pinned():
     profile = resolve_model_profile(DEFAULT_MODEL_PROFILE)
+    assert DEFAULT_MODEL_PROFILE == "qwen2.5-0.5b"
     assert profile == MODEL_PROFILES[DEFAULT_MODEL_PROFILE]
     assert len(profile.revision) == 40
     assert profile.target_modules
     assert profile.license_name and profile.license_url
+    assert profile.parameters_billions <= 8.1
 
 
 def test_built_in_profiles_are_not_partially_overridden():
@@ -44,6 +46,10 @@ def test_unknown_profile_is_rejected():
 
 def test_profile_keys_include_builtins_and_custom():
     assert set(MODEL_PROFILES) < set(model_profile_keys())
+    assert len(MODEL_PROFILES) >= 8
+    assert "qwen2.5-0.5b" in MODEL_PROFILES
+    assert all(profile.parameters_billions <= 8.1 for profile in MODEL_PROFILES.values())
+    assert len({profile.model_id for profile in MODEL_PROFILES.values()}) == len(MODEL_PROFILES)
     assert "custom" in model_profile_keys()
 
 

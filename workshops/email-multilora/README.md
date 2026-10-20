@@ -2,8 +2,9 @@
 
 Build, train, and evaluate a multi-label email classifier with one configurable, pinned
 open-weight language model and separate operations, finance, and travel LoRA adapters.
-The workshop defaults to a small Qwen profile for accessibility, but Qwen is not part of
-the task definition or architecture.
+The local workshop defaults to Qwen2.5 0.5B for accessible iteration on modest hardware.
+Nemotron Nano 8B remains an optional NVIDIA profile with additional memory and prompt-contract
+requirements.
 
 New to the source? Read the [code companion](docs/CODE_COMPANION.md) for a guided tour of
 the dataset, router, LoRA training, adapter switching, evaluation, pipeline, tests and
@@ -21,7 +22,15 @@ Need to provision Nemotron itself first? Use the separate
 a dedicated account/project and parameterized managed-compute model deployment.
 The model's preview GPU quota and billing are separate from API hosting.
 
-Start with [01: data and routing](notebooks/01_email_data_and_routing.ipynb), then [02: train adapters](notebooks/02_train_email_adapters.ipynb), and [03: compare and serve](notebooks/03_compare_and_serve.ipynb).
+The classification path uses [01: data and routing](notebooks/01_email_data_and_routing.ipynb), [02: train adapters](notebooks/02_train_email_adapters.ipynb), and [03: compare and serve](notebooks/03_compare_and_serve.ipynb).
+
+The persona-response path uses [04: select one client and prepare replies](notebooks/04_persona_response_data.ipynb), [05: train that client's adapter](notebooks/05_train_persona_adapter.ipynb), and [06: compare and serve persona adapters](notebooks/06_compare_persona_responses.ipynb). Change `CLIENT_ID` at the top of each persona notebook; `config/persona_registry.json` resolves the matching profile and reviewed input CSV.
+
+Use [07: exhaustive persona evaluation techniques](notebooks/07_persona_evaluation_techniques.ipynb)
+to learn integrity gates, training diagnostics, lexical and semantic metrics, style analysis,
+grounding heuristics, paired statistics, blinded human review, inter-rater agreement,
+LLM-as-judge controls, robustness testing, slicing, and final-test governance. The detailed
+sequence is also documented in [the evaluation plan](docs/PERSONA_EVALUATION_PLAN.md).
 
 The notebooks match the CLM examples' structure: a primary question, evaluation contract, secure configuration, explicit execution gates, data checks, tables/charts, prediction artifacts, and interpretation checklists. They use a separate package and environment; nothing in CLM is modified.
 
@@ -105,6 +114,46 @@ Allow roughly 3 hours of guided work, plus training/inference time. Training tim
 | Compare | 30 min + compute | Base/generalist/all-specialists/routed on same IDs | Predictions and comparison CSV |
 | Serve (optional) | 25 min + setup | Static vLLM registration; concurrent synthetic requests | Serving smoke artifact |
 | Debrief | 20 min | Inspect finance/travel errors; freeze final test protocol | Decision notes |
+
+### Persona response extension
+
+Allow another 60 minutes plus training/inference time for notebooks 04-06:
+
+| Lab | Time | Participant actions | Exit artifact |
+|---|---:|---|---|
+| Select client | 15 min | Choose `CLIENT_ID`; verify registry, profile, CSV checksum, and stable splits | Persona data identity |
+| Train client adapter | 20 min + compute | Inspect completion masking; train one independent response-writing LoRA | Persona adapter manifest |
+| Compare and serve | 25 min + compute | Compare base/adapted replies; freeze human rubric; inventory shared adapters | Response metrics and vLLM command |
+| Evaluation methods | 60–90 min + review | Run paired metrics, confidence intervals, risk review, human A/B, and robustness protocol | Evaluation report and release decision |
+
+### Sequential persona-adapter pipeline
+
+The persona pipeline applies notebooks 04-06 to every registered client, one adapter at a time.
+It defaults to pinned `Qwen2.5-3B-Instruct`, which provides more response-writing capacity than
+the 0.5B notebook default while fitting this workshop machine's 24 GiB RTX 3090 in BF16. It uses
+one epoch, a 1,024-token context, rank 8, batch size 1, accumulation 8, and eight validation
+examples per client. Final test data remains sealed.
+
+Review the resolved plan:
+
+```powershell
+.\.venv\Scripts\python.exe -m email_workshop.persona_pipeline `
+  --workshop-root . `
+  --root artifacts\persona-qwen2.5-3b-full
+```
+
+Run all ten registered client adapters sequentially:
+
+```powershell
+.\.venv\Scripts\python.exe -m email_workshop.persona_pipeline `
+  --workshop-root . `
+  --root artifacts\persona-qwen2.5-3b-full `
+  --run
+```
+
+The pipeline writes `persona_pipeline/status.json` after every transition and reuses only
+complete adapters whose model, training configuration, profile, and data lineage match. An
+incomplete adapter directory or a conflicting configuration fails explicitly.
 
 See [FACILITATOR.md](FACILITATOR.md) for guided questions, expected observations, and demo failure handling.
 
@@ -282,11 +331,23 @@ The CLI evaluation compares the four LLM strategies. Notebook 03 additionally in
   [`model_profiles.py`](email_workshop/model_profiles.py).
 - Every profile pins an immutable revision, LoRA target modules, display name, license name/link,
   and operational notes.
-- Built-in profiles:
-  - `qwen2.5-0.5b` — accessible default,
-    [Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct).
-  - `nemotron-nano-8b` — locally validated larger option,
-    [Llama-3.1-Nemotron-Nano-8B-v1](https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-8B-v1).
+- Built-in profiles (all labeled 8B or smaller):
+
+| Profile key | Model | Parameters | Access/license | Intended use |
+|---|---|---:|---|---|
+| `nemotron-nano-8b` | [Llama 3.1 Nemotron Nano 8B v1](https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-8B-v1) | 8.03B | Public; NVIDIA Open Model License | Optional NVIDIA LoRA/NIM study profile |
+| `llama3.1-8b` | [Llama 3.1 8B Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct) | 8.03B | Gated; Llama 3.1 license | Popular gated 8B baseline |
+| `qwen2.5-7b` | [Qwen2.5 7B Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) | 7.62B | Public; Apache-2.0 | Strong public general-purpose option |
+| `mistral-7b-v0.3` | [Mistral 7B Instruct v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) | 7.25B | Public; Apache-2.0 | Established 7B baseline |
+| `phi-4-mini` | [Phi-4 Mini Instruct](https://huggingface.co/microsoft/Phi-4-mini-instruct) | 3.84B | Public; MIT | Compact Microsoft model |
+| `qwen2.5-3b` | [Qwen2.5 3B Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) | 3.09B | Public; Qwen Research License | Mid-size Qwen option |
+| `gemma2-2b` | [Gemma 2 2B Instruct](https://huggingface.co/google/gemma-2-2b-it) | 2.61B | Gated; Gemma terms | Compact gated option |
+| `smollm2-1.7b` | [SmolLM2 1.7B Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct) | 1.71B | Public; Apache-2.0 | Lower-memory experiment |
+| `qwen2.5-0.5b` | [Qwen2.5 0.5B Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | 0.49B | Public; Apache-2.0 | **Local workshop default** |
+
+Profile metadata was verified against Hugging Face model APIs on 2026-10-19. Every profile pins
+the exact Hub commit reported on that date. Gated profiles require prior license acceptance and
+authentication.
 - `custom` requires an explicit model ID, immutable revision and target-module list.
 - A model is compatible only if Transformers can load it without unreviewed remote code,
   it has a usable chat template and EOS token, it is a causal language model, and the named
@@ -310,14 +371,14 @@ choice and refuses to evaluate adapters whose manifest does not match it.
 For the staged pipeline:
 
 ```powershell
-# Accessible default
+# Default local profile
 .\.venv\Scripts\python.exe -m email_workshop.pipeline `
   --profile full `
   --device cuda `
   --model-profile qwen2.5-0.5b `
   --artifacts .\artifacts\qwen-full-01
 
-# Larger validated profile
+# Optional NVIDIA profile
 .\.venv\Scripts\python.exe -m email_workshop.pipeline `
   --profile full `
   --device cuda `
@@ -327,6 +388,10 @@ For the staged pipeline:
 
 These examples print plans only. Add `--run` after reviewing model license, download size,
 hardware fit, artifact root and test-split policy.
+
+Before selecting Nemotron, read the
+[Nemotron LoRA and Multi-LoRA findings](docs/NEMOTRON_LORA_FINDINGS.md). The NVIDIA-supported
+NeMo/NIM path and the workshop's local Transformers/PEFT path have different hardware guarantees.
 
 For another compatible open-weight model:
 

@@ -27,26 +27,41 @@ def test_no_machine_specific_checkout_paths():
             if path.suffix not in suffixes:
                 continue
             text = path.read_text(encoding="utf-8")
+            if path.suffix == ".ipynb":
+                notebook = json.loads(text)
+                for cell in notebook.get("cells", []):
+                    if cell.get("cell_type") == "code":
+                        cell["outputs"] = []
+                        cell["execution_count"] = None
+                text = json.dumps(notebook)
             assert not pattern.search(text), str(path.relative_to(REPOSITORY))
 
 
 def test_notebook_artifacts_are_workshop_relative(monkeypatch):
     monkeypatch.setenv("EMAIL_WORKSHOP_RUN", "artifacts/custom-run")
+    monkeypatch.setenv("EMAIL_PERSONA_RUN", "artifacts/custom-persona-run")
     for path in (WORKSHOP / "notebooks").glob("*.ipynb"):
         notebook = json.loads(path.read_text(encoding="utf-8"))
         config = next(cell for cell in notebook["cells"] if cell.get("id") == "config")
         source = config["source"]
         tree = ast.parse("".join(source) if isinstance(source, list) else source)
+        persona_notebook = path.name.startswith(("04_", "05_", "06_", "07_"))
+        variable = "PERSONA_RUN_ROOT" if persona_notebook else "ARTIFACT_DIR"
         assignment = next(
             node for node in tree.body
             if isinstance(node, ast.Assign)
-            and any(isinstance(target, ast.Name) and target.id == "ARTIFACT_DIR"
+            and any(isinstance(target, ast.Name) and target.id == variable
                     for target in node.targets)
         )
         value = eval(compile(ast.Expression(assignment.value), "<artifact-config>", "eval"), {
             "Path": Path, "os": os, "WORKSHOP_ROOT": WORKSHOP,
         })
-        assert value == WORKSHOP / "artifacts" / "custom-run"
+        expected = (
+            WORKSHOP / "artifacts" / "custom-persona-run"
+            if persona_notebook
+            else WORKSHOP / "artifacts" / "custom-run"
+        )
+        assert value == expected
 
 
 def test_vllm_command_uses_relative_adapter_paths(monkeypatch, tmp_path):
