@@ -1,5 +1,28 @@
 # Workshop Validation Record
 
+## Apple Silicon Nemotron LoRA Lab (2026-10-21)
+
+Added an optional Mac training-first tutorial in
+[docs/APPLE_SILICON_LORA.md](docs/APPLE_SILICON_LORA.md), with launchers under
+`scripts/` and a separate MLX configuration under `config/`. The existing
+Qwen/PEFT pipeline, model profiles, notebooks, and datasets are unchanged.
+
+| Check | Result |
+| --- | --- |
+| Shell launcher syntax | Passed |
+| Tiny BF16 Nemotron-H LoRA backward and Adam step | Passed on M5 Pro / 48 GB; 20 trainable tensors, finite nonzero gradients |
+| Migrated API smoke via the existing LAN hostname | Passed health, model discovery, and generated answer `4` |
+| Focused launcher and repository-path tests | 13 passed |
+| Lint for migrated Python scripts and new tests | Passed |
+
+The live checks used MLX-LM/vLLM/vLLM-Metal 0.32.0. The portable launcher
+checks use process doubles, not real training data or a cloud service.
+The tiny random-model step is not a full-checkpoint or quality evaluation.
+Real-data LoRA, MLX adapter export to PEFT/vLLM, and multi-adapter serving
+remain unverified. No cloud resources or model calls were used for this lab.
+
+## Windows Baseline (2026-10-17)
+
 Validated on **2026-10-17** on Windows with Python 3.12.10 in the workshop's isolated environment.
 
 ## Executed

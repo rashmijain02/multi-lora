@@ -6,6 +6,13 @@ The local workshop defaults to Qwen2.5 0.5B for accessible iteration on modest h
 Nemotron Nano 8B remains an optional NVIDIA profile with additional memory and prompt-contract
 requirements.
 
+For **Apple Silicon LoRA training**, follow the optional
+[Nemotron Mac lab](docs/APPLE_SILICON_LORA.md). Its numbered tutorial covers
+MLX setup, model identity, gradient checks, email data, bounded training,
+adapter evaluation, multiple-adapter planning, and optional vLLM-Metal/LAN
+inference. It uses a separate 4B Nemotron-H base and MLX runtime; it does not
+replace the existing PEFT pipeline or claim automatic adapter interoperability.
+
 New to the source? Read the [code companion](docs/CODE_COMPANION.md) for a guided tour of
 the dataset, router, LoRA training, adapter switching, evaluation, pipeline, tests and
 separate Azure hosting path.
