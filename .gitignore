@@ -10,7 +10,8 @@ __pycache__/
 .env.*
 !.env.example
 .copilot-azure/
-workshops/email-multilora/artifacts/
+workshops/email-multilora/artifacts/*
+!workshops/email-multilora/artifacts/README.md
 workshops/email-multilora/.cache/
 # Email workshop data is local by default.
 workshops/email-multilora/data/*

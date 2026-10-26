@@ -41,6 +41,12 @@ sequence is also documented in [the evaluation plan](docs/PERSONA_EVALUATION_PLA
 
 The notebooks match the CLM examples' structure: a primary question, evaluation contract, secure configuration, explicit execution gates, data checks, tables/charts, prediction artifacts, and interpretation checklists. They use a separate package and environment; nothing in CLM is modified.
 
+For an experiment readout, use the [five-slide presentation](docs/presentations/multi-lora-final-results.pptx)
+and [slide companion](docs/presentations/multi-lora-final-results-companion.md). They separate completed
+classification validation from preliminary persona-response diagnostics and explain the next evaluation gates.
+Before presenting to leadership or data scientists, review the
+[leadership and data-science grilling guide](docs/presentations/PRESENTER_GUIDE.md).
+
 ## Important correction: this dataset is multi-label
 
 [imnim/multiclass-email-classification](https://huggingface.co/datasets/imnim/multiclass-email-classification) contains a `labels` array, not one mutually exclusive class. For example, the same email can be `Business` and `Reminders`. Forcing a single label would discard supervision and make the routing task misleading.
