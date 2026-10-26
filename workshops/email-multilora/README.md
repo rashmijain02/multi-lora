@@ -6,6 +6,17 @@ The local workshop defaults to Qwen2.5 0.5B for accessible iteration on modest h
 Nemotron Nano 8B remains an optional NVIDIA profile with additional memory and prompt-contract
 requirements.
 
+For a proposed next project using these ten personas and response adapters, read
+[PersonaDesk: self-hosted personal agents](../personal-agent-multilora/PROPOSAL.md).
+It uses Hermes as the only agent framework, with a PersonaDesk plugin, Multi-LoRA draft
+writing, and human-reviewed learning. Missing capabilities are planned as Hermes extensions.
+This is a proposal with hardware qualification gates, not an implemented agent integration.
+V1 is self-hosted; V2 plans to host the same custom Hermes harness in Azure Foundry Agent
+Service, with separately qualified managed model and adapter inference.
+Its classification extension adds CLMClient typed choices, projection-head training, and
+calibration/robustness comparisons without conflating the CLM six-class taxonomy with this
+workshop's ten-label task.
+
 New to the source? Read the [code companion](docs/CODE_COMPANION.md) for a guided tour of
 the dataset, router, LoRA training, adapter switching, evaluation, pipeline, tests and
 separate Azure hosting path.

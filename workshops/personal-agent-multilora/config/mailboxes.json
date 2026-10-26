@@ -1,0 +1,25 @@
+{
+  "_comment": "Local-only mail simulator. Every address below lives on 127.0.0.1; mail to any other address is refused. The shared password is a documented lab value, not a secret.",
+  "server": {
+    "host": "127.0.0.1",
+    "smtp_port": 2525,
+    "imap_port": 1143,
+    "authserv_id": "mailsim.personadesk.test",
+    "shared_password": "personadesk-local"
+  },
+  "accounts": {
+    "priya.raman@company.example": {"name": "Priya Raman", "persona": "priya-raman-support"},
+    "daniel.okafor@company.example": {"name": "Daniel Okafor", "persona": "daniel-okafor-cfo"},
+    "noah.williams@company.example": {"name": "Noah Williams", "persona": "noah-williams-assistant"},
+    "assistant@company.example": {"name": "Hermes Gateway Sandbox"},
+    "alex.morgan@customer.example": {"name": "Alex Morgan", "facts": {"plan": "business"}},
+    "jamie.lee@customer.example": {"name": "Jamie Lee", "facts": {"plan": "starter"}},
+    "it-desk@customer.example": {"name": "Customer IT Desk", "facts": {"plan": "enterprise"}},
+    "ap-team@company.example": {"name": "AP Team"},
+    "facilities@company.example": {"name": "Facilities"},
+    "billing@contoso-supplies.example": {"name": "Contoso Supplies Billing"},
+    "maya.chen@company.example": {"name": "Maya Chen"},
+    "maya.assistant-request@company.example": {"name": "Maya Chen (assistant requests)"},
+    "events@partner.example": {"name": "Partner Events"}
+  }
+}

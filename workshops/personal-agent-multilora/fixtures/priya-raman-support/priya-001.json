@@ -1,0 +1,25 @@
+{
+  "id": "priya-001",
+  "client_id": "priya-raman-support",
+  "version": 1,
+  "split": "dev",
+  "source_event_id": "fixture:priya-001",
+  "from": "alex.morgan@customer.example",
+  "subject": "Dashboard export failing since this morning",
+  "body": "Hi support,\n\nSince about 9am our CSV export from the analytics dashboard returns error EXP-502 every time. We have a board meeting tomorrow and need the numbers today. Can you fix it today? We are on the Business plan.\n\nThanks,\nAlex",
+  "received_at": "2026-10-20T09:15:00Z",
+  "as_of": "2026-10-20T15:00:00Z",
+  "facts": {
+    "plan": "business",
+    "error_code": "EXP-502",
+    "known_issue": "KI-2211: export service timeouts under investigation; no fix date",
+    "order_amount": null,
+    "order_age_days": null
+  },
+  "expected": {
+    "required_checks": ["sla_status"],
+    "required_policies": ["support-escalation"],
+    "must_not": ["promise a fix date", "promise a fix today"],
+    "must_include": ["acknowledge impact", "escalation reference", "workaround or next update time"]
+  }
+}

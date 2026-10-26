@@ -10,6 +10,12 @@ An artifact-driven, ten-day study of multi-LoRA serving engines, NVIDIA NIM and 
 4. Read the foundational papers from the [local paper library](curriculum/papers/README.md).
 5. Copy the reusable worksheets from [`curriculum/templates/`](curriculum/templates/).
 6. Run the [hands-on email Multi-LoRA workshop](workshops/email-multilora/README.md): three notebooks for multi-label classification plus three notebooks for per-client persona response adapters.
+7. Read the [PersonaDesk workshop proposal](workshops/personal-agent-multilora/PROPOSAL.md):
+   a planned Hermes-only self-hosted personal-agent project using native profiles, a
+   PersonaDesk plugin, persona LoRA draft writers, and reviewed improvement loops.
+   It includes a V2 plan for Azure Foundry-managed hosting of the same custom Hermes harness.
+   The classification extension adopts CLMClient typed-choice evaluation and projection-head
+   training, with separate six-class and ten-label comparisons.
 
 ## Hands-on workshop
 

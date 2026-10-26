@@ -19,6 +19,7 @@ def test_no_machine_specific_checkout_paths():
     excluded = {
         ".git", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache",
         ".ipynb_checkpoints", ".copilot-azure", "artifacts", ".cache",
+        "external",  # third-party git submodules are scanned by their own repositories
     }
     for directory, names, files in os.walk(REPOSITORY):
         names[:] = [name for name in names if name not in excluded]

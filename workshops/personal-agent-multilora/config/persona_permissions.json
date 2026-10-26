@@ -1,0 +1,48 @@
+{
+  "version": "2026-10-25.1",
+  "defaults": {
+    "max_turns": 8,
+    "worker_timeout_seconds": 600,
+    "max_tool_output_chars": 4000,
+    "max_task_chars": 500
+  },
+  "personas": {
+    "priya-raman-support": {
+      "enabled": true,
+      "hermes_profile": "pd-priya",
+      "writer_adapter": "priya-raman",
+      "tasks": ["draft_reply", "escalation_packet"],
+      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message"],
+      "policies": ["support-escalation", "support-refunds"],
+      "checks": ["sla_status", "refund_eligibility"],
+      "blocked_actions": ["send_email", "issue_refund", "promise_fix_date", "change_account"]
+    },
+    "daniel-okafor-cfo": {
+      "enabled": true,
+      "hermes_profile": "pd-daniel",
+      "writer_adapter": "daniel-okafor",
+      "tasks": ["draft_reply", "approval_packet"],
+      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message"],
+      "policies": ["finance-approvals", "finance-vendor-payments"],
+      "checks": ["invoice_po_match", "approval_threshold"],
+      "blocked_actions": ["send_email", "approve_payment", "release_funds", "change_bank_details"]
+    },
+    "noah-williams-assistant": {
+      "enabled": true,
+      "hermes_profile": "pd-noah",
+      "writer_adapter": "noah-williams",
+      "tasks": ["draft_reply", "travel_options"],
+      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message"],
+      "policies": ["travel-policy", "calendar-etiquette"],
+      "checks": ["calendar_conflict", "travel_policy"],
+      "blocked_actions": ["send_email", "book_travel", "accept_invite", "share_itinerary_externally"]
+    },
+    "maya-chen-ceo": {"enabled": false, "hermes_profile": "pd-maya", "writer_adapter": "maya-chen", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]},
+    "lucas-silva-engineer": {"enabled": false, "hermes_profile": "pd-lucas", "writer_adapter": "lucas-silva", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]},
+    "amina-yusuf-sales": {"enabled": false, "hermes_profile": "pd-amina", "writer_adapter": "amina-yusuf", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]},
+    "jordan-lee-people-ops": {"enabled": false, "hermes_profile": "pd-jordan", "writer_adapter": "jordan-lee", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]},
+    "elena-petrova-marketing": {"enabled": false, "hermes_profile": "pd-elena", "writer_adapter": "elena-petrova", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]},
+    "marcus-green-legal": {"enabled": false, "hermes_profile": "pd-marcus", "writer_adapter": "marcus-green", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]},
+    "sofia-alvarez-operations": {"enabled": false, "hermes_profile": "pd-sofia", "writer_adapter": "sofia-alvarez", "tasks": [], "tools": [], "policies": [], "checks": [], "blocked_actions": ["send_email"]}
+  }
+}

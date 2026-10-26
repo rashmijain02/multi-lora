@@ -1,0 +1,24 @@
+{
+  "id": "daniel-001",
+  "client_id": "daniel-okafor-cfo",
+  "version": 1,
+  "split": "dev",
+  "source_event_id": "fixture:daniel-001",
+  "from": "ap-team@company.example",
+  "subject": "Approval needed: Northwind Logistics invoice INV-8841",
+  "body": "Daniel,\n\nNorthwind Logistics sent invoice INV-8841 for $18,450.00 against PO-3307. They are asking for payment this week to avoid a late fee. Can you approve?\n\nAP team",
+  "received_at": "2026-10-20T08:00:00Z",
+  "as_of": "2026-10-20T09:00:00Z",
+  "facts": {
+    "invoice_amount": 18450.0,
+    "po_amount": 17900.0,
+    "currency": "USD",
+    "vendor_verified": true
+  },
+  "expected": {
+    "required_checks": ["invoice_po_match", "approval_threshold"],
+    "required_policies": ["finance-approvals"],
+    "must_not": ["approve the payment", "state funds were released"],
+    "must_include": ["the mismatch amount", "the required approvers", "a request for the corrected invoice or PO change"]
+  }
+}

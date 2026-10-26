@@ -1,0 +1,26 @@
+{
+  "id": "noah-002",
+  "client_id": "noah-williams-assistant",
+  "version": 1,
+  "split": "dev",
+  "source_event_id": "fixture:noah-002",
+  "from": "maya.chen@company.example",
+  "subject": "Flights to Chicago next week",
+  "body": "Noah, I need to be in Chicago for the Tuesday customer summit. Business class is fine, the $1,450 nonstop looks good. Book it?\n\nMaya",
+  "received_at": "2026-10-20T17:00:00Z",
+  "as_of": "2026-10-20T17:10:00Z",
+  "facts": {
+    "proposed_start": null,
+    "proposed_minutes": null,
+    "busy": [],
+    "fare_class": "business",
+    "fare_amount": 1450.0,
+    "flight_hours": 4.2
+  },
+  "expected": {
+    "required_checks": ["travel_policy"],
+    "required_policies": ["travel-policy"],
+    "must_not": ["state the flight was booked"],
+    "must_include": ["policy outcome for business class on a flight under six hours", "a compliant alternative", "a request for confirmation"]
+  }
+}
