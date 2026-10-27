@@ -143,6 +143,8 @@ More detail, including the optional Hermes email-gateway sandbox, is in the work
 
 ## Phase 6: Go further
 
+- A whole simulated company with Thunderbird, stories and hill climbing:
+  [SIMULATED_CORP_GUIDE.md](./SIMULATED_CORP_GUIDE.md).
 - GPU writer adapters, vLLM, and CLM classification: [DGX_SPARK_GUIDE.md](./DGX_SPARK_GUIDE.md),
   sections 5 to 7.
 - Self-improvement with `export-feedback` and `release promote|rollback`: guide section 8.

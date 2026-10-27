@@ -9,7 +9,13 @@ job:
 | **Writer** (base model + persona LoRA adapter) | Phrases the reply in the persona's voice from verified facts | Tools, memory, or approvals |
 | **Human reviewer** (listed OS operator) | Approves or rejects the exact draft revision; consents to learning | — |
 
-New learners: start with the step-by-step [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
+New learners: start with the step-by-step [docs/USER_GUIDE.md](docs/USER_GUIDE.md), then build
+the simulated company with [docs/SIMULATED_CORP_GUIDE.md](docs/SIMULATED_CORP_GUIDE.md).
+Where the stories go next: [docs/STORY_PLAN_ENTERPRISE.md](docs/STORY_PLAN_ENTERPRISE.md)
+(company-wide arcs) and three legal arcs:
+[change of control](docs/STORY_PLAN_LEGAL_CHANGE_OF_CONTROL.md),
+[MSA negotiation](docs/STORY_PLAN_LEGAL_MSA_NEGOTIATION.md),
+[litigation hold](docs/STORY_PLAN_LEGAL_LITIGATION_HOLD.md).
 Design: [PROPOSAL.md](PROPOSAL.md). Phased learning path: [LEARNING_PLAN.md](LEARNING_PLAN.md).
 Full GPU experience: [docs/DGX_SPARK_GUIDE.md](docs/DGX_SPARK_GUIDE.md).
 
@@ -140,6 +146,9 @@ uv run pd-mail reset                       # empty every mailbox
 ```
 
 Any IMAP/SMTP client works too: plaintext, the ports above, the account address as user name.
+`uv run python scripts/setup_thunderbird.py --apply` creates a separate Thunderbird profile with
+every account (the new Outlook for Windows cannot reach loopback servers); see
+[docs/SIMULATED_CORP_GUIDE.md](docs/SIMULATED_CORP_GUIDE.md).
 
 ### Mail intake (recommended path)
 

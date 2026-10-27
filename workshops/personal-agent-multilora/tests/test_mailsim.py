@@ -138,3 +138,37 @@ def test_intake_run_drafts_free_form_mail_and_rejects_unauthenticated(root, db, 
     drafted, rejected = out["items"]
     assert drafted["status"] == "awaiting_review"
     assert rejected["rejected"] == "sender not authenticated by mailsim"
+
+
+def _load_setup_thunderbird():
+    import importlib.util
+
+    from conftest import WORKSHOP
+
+    spec = importlib.util.spec_from_file_location(
+        "setup_thunderbird", WORKSHOP / "scripts" / "setup_thunderbird.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_thunderbird_profile_covers_every_account_and_keeps_sent_local(tmp_path):
+    tb = _load_setup_thunderbird()
+    mailboxes = json.loads((tb.WORKSHOP / "config" / "mailboxes.json").read_text("utf-8"))
+    prefs = tb.build_prefs(mailboxes)
+
+    users = {v for k, v in prefs.items() if k.startswith("mail.server.") and
+             k.endswith(".userName") and v != "nobody"}
+    assert users == set(mailboxes["accounts"])
+    assert all(v.startswith("mailbox://nobody@Local%20Folders/") for k, v in prefs.items()
+               if k.endswith((".fcc_folder", ".draft_folder", ".stationery_folder")))
+    assert all(v == 2 for k, v in prefs.items() if k.endswith(".delete_model"))
+    with pytest.raises(ValueError):
+        tb.build_prefs(mailboxes, ["someone@gmail.com"])
+
+    profile = tmp_path / "tb"
+    args = ["--profile-dir", str(profile), "--thunderbird", str(tmp_path / "missing.exe")]
+    assert tb.main(args) == 0 and not profile.exists()
+    assert tb.main([*args, "--apply"]) == 0
+    assert PRIYA in (profile / "prefs.js").read_text("utf-8")
+    assert tb.main([*args, "--apply"]) == 1
