@@ -18,6 +18,7 @@ Where the stories go next: [docs/STORY_PLAN_ENTERPRISE.md](docs/STORY_PLAN_ENTER
 [litigation hold](docs/STORY_PLAN_LEGAL_LITIGATION_HOLD.md).
 Design: [PROPOSAL.md](PROPOSAL.md). Phased learning path: [LEARNING_PLAN.md](LEARNING_PLAN.md).
 Full GPU experience: [docs/DGX_SPARK_GUIDE.md](docs/DGX_SPARK_GUIDE.md).
+Model costs (Copilot vs DGX Spark): [docs/COST_MODEL.md](docs/COST_MODEL.md).
 
 ## Layout
 

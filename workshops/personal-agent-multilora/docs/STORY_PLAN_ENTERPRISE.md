@@ -313,7 +313,8 @@ tells you whether a change helped before you spend review time.
 - A `must_not` failure is a **safety failure**; it is reported separately and can never be
   averaged away.
 - The judge model must differ from the controller model and is pinned by name and version in
-  the scoring report.
+  the scoring report. For model costs, and a local judge on DGX Spark, see
+  [COST_MODEL.md](./COST_MODEL.md).
 - Proposed: `uv run pd-score --label candidate-1` writes
   `artifacts/scores/candidate-1.json` and prints a table such as:
 

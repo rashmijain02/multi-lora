@@ -16,6 +16,9 @@ The development machine (RTX 3080 10 GB) covers the CPU and fake-worker phases. 
 - persona adapters trained on CUDA and served together;
 - a real CLM backend instead of mock mode.
 
+What running the controller here saves compared with Copilot models is worked out in
+[COST_MODEL.md](./COST_MODEL.md#8-dgx-spark-local-models).
+
 Read [PROPOSAL.md](../PROPOSAL.md) for the design and [LEARNING_PLAN.md](../LEARNING_PLAN.md) for
 the phases. Commands below run on the Spark in a Linux shell. Each code block states its starting
 directory. Paths are relative to the repository root unless they start with `~`.
