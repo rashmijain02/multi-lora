@@ -1,4 +1,27 @@
-# Foundry PowerShell workflows
+# Workshop Scripts
+
+## Apple Silicon LoRA And Inference
+
+Follow the [numbered Nemotron Mac lab](../docs/APPLE_SILICON_LORA.md) for the
+training plan, prerequisites, data contract, and validation limits. Commands
+below start in the workshop directory:
+
+```sh
+export MLX_PYTHON="$(brew --prefix vllm-metal)/libexec/bin/python"
+"$MLX_PYTHON" scripts/check-nemotron-lora.py
+sh scripts/train-nemotron.sh data/nemotron-mlx/finance artifacts/nemotron-mlx/finance-smoke --iters 2 --save-every 2
+```
+
+Prepare real train/validation JSONL first. The training script resolves relative
+paths from the workshop root and rejects an existing output directory. Use a
+reviewed local model snapshot via `--model` for reproducible experiments.
+
+The separate `serve-nemotron.sh` starts base-model inference; `smoke-nemotron.py`
+checks health and chat generation. LAN binding is opt-in with
+`NEMOTRON_HOST=0.0.0.0`. This is unauthenticated HTTP for trusted networks only,
+not proof of trained-adapter or multi-LoRA serving support.
+
+## Foundry PowerShell Workflows
 
 ## Interactive managed-compute deployment wizard
 

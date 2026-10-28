@@ -6,6 +6,13 @@ The local workshop defaults to Qwen2.5 0.5B for accessible iteration on modest h
 Nemotron Nano 8B remains an optional NVIDIA profile with additional memory and prompt-contract
 requirements.
 
+For **Apple Silicon LoRA training**, follow the optional
+[Nemotron Mac lab](docs/APPLE_SILICON_LORA.md). Its numbered tutorial covers
+MLX setup, model identity, gradient checks, email data, bounded training,
+adapter evaluation, multiple-adapter planning, and optional vLLM-Metal/LAN
+inference. It uses a separate 4B Nemotron-H base and MLX runtime; it does not
+replace the existing PEFT pipeline or claim automatic adapter interoperability.
+
 The next workshop, [PersonaDesk: self-hosted personal agents](../personal-agent-multilora/README.md),
 uses these personas and response adapters (start with its
 [user guide](../personal-agent-multilora/docs/USER_GUIDE.md); design in the
@@ -46,6 +53,12 @@ LLM-as-judge controls, robustness testing, slicing, and final-test governance. T
 sequence is also documented in [the evaluation plan](docs/PERSONA_EVALUATION_PLAN.md).
 
 The notebooks match the CLM examples' structure: a primary question, evaluation contract, secure configuration, explicit execution gates, data checks, tables/charts, prediction artifacts, and interpretation checklists. They use a separate package and environment; nothing in CLM is modified.
+
+For an experiment readout, use the [five-slide presentation](docs/presentations/multi-lora-final-results.pptx)
+and [slide companion](docs/presentations/multi-lora-final-results-companion.md). They separate completed
+classification validation from preliminary persona-response diagnostics and explain the next evaluation gates.
+Before presenting to leadership or data scientists, review the
+[leadership and data-science grilling guide](docs/presentations/PRESENTER_GUIDE.md).
 
 ## Important correction: this dataset is multi-label
 
