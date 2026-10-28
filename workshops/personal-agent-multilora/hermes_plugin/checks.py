@@ -131,6 +131,12 @@ def travel_policy(fixture: dict[str, Any], p: Params) -> dict[str, Any]:
     facts = fixture["facts"]
     fare_class = facts.get("fare_class")
     if not fare_class:
+        # Rule 4: an external sender never gets itinerary details; pickups go via the travel desk.
+        domain = str(fixture.get("from", "")).lower().rpartition("@")[2]
+        internal = p.get("internal_domains")
+        if internal and domain and domain not in internal:
+            return {"outcome": "external_request", "share_itinerary": False,
+                    "pickup_channel": p.get("pickup_channel", "company travel desk")}
         return {"outcome": "not_applicable"}
     hours = facts.get("flight_hours")
     amount = facts.get("fare_amount")
@@ -153,6 +159,11 @@ def travel_policy(fixture: dict[str, Any], p: Params) -> dict[str, Any]:
         "requires_traveler_confirmation": True,
     }
 
+
+# A check result flag that applies a rule from a second policy: (check, flag) -> policy id.
+RELATED_POLICIES: dict[tuple[str, str], str] = {
+    ("invoice_po_match", "payment_hold"): "finance-vendor-payments",
+}
 
 CHECKS: dict[str, tuple[str, Callable[[dict[str, Any], Params], dict[str, Any]]]] = {
     "sla_status": ("support-escalation", sla_status),

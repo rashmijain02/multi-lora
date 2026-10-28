@@ -98,7 +98,11 @@ def run_check(rt: Runtime, grant: PersonaGrant, check: str, fixture: Fixture) ->
     policy_id, fn = checks_mod.CHECKS[check]
     policy = load_policy(rt.root, grant, policy_id)
     result = fn(fixture.data, policy.parameters)
-    return {"check": check, **result, "evidence": [fixture.reference(), policy.reference()]}
+    evidence = [fixture.reference(), policy.reference()]
+    for (name, flag), related in checks_mod.RELATED_POLICIES.items():
+        if name == check and result.get(flag):
+            evidence.append(load_policy(rt.root, grant, related).reference())
+    return {"check": check, **result, "evidence": evidence}
 
 
 def brief_from_checks(fixture: Fixture, results: list[dict[str, Any]]) -> tuple[list, list]:
@@ -154,6 +158,11 @@ def brief_from_checks(fixture: Fixture, results: list[dict[str, Any]]) -> tuple[
                 brief.append("The requested time is available; awaiting confirmation before "
                              "sending any invite.")
         elif name == "travel_policy":
+            if outcome == "external_request":
+                brief.append("We do not share travel or itinerary details outside the company; "
+                             f"please coordinate the pickup through the {r['pickup_channel']}, "
+                             "our approved channel for this.")
+                continue
             if outcome == "non_compliant":
                 brief.append(f"Policy check: {', '.join(r['reasons'])}. A "
                              f"{r['compliant_alternative']} fare is the compliant alternative.")

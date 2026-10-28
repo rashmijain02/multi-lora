@@ -28,6 +28,10 @@ def test_finance_checks(root, db):
     assert approvers == ["budget owner", "CFO"]
     fraud = check(root, db, "pd-daniel", "invoice_po_match", "daniel-002")
     assert (fraud["outcome"], fraud["payment_hold"]) == ("match", True)
+    policies = {e["source_id"] for e in fraud["evidence"] if e["kind"] == "policy"}
+    assert policies == {"policy:finance-approvals", "policy:finance-vendor-payments"}
+    verified = check(root, db, "pd-daniel", "invoice_po_match", "daniel-003")
+    assert "policy:finance-vendor-payments" not in str(verified["evidence"])
     assert check(root, db, "pd-daniel", "approval_threshold", "daniel-003")["approvers"] == \
         ["budget owner"]
 
@@ -44,6 +48,14 @@ def test_travel_policy(root, db):
     assert result["outcome"] == "non_compliant"
     assert result["reasons"] == ["business_class_below_min_duration"]
     assert result["compliant_alternative"] == "economy"
+
+
+def test_travel_policy_keeps_itinerary_internal_for_external_senders(root, db):
+    external = check(root, db, "pd-noah", "travel_policy", "noah-003")
+    assert (external["outcome"], external["share_itinerary"]) == ("external_request", False)
+    assert external["pickup_channel"] == "company travel desk"
+    # Internal mail without a fare is still outside the travel policy.
+    assert check(root, db, "pd-noah", "travel_policy", "noah-001")["outcome"] == "not_applicable"
 
 
 def test_unknown_check_is_invalid(root, db):

@@ -380,8 +380,17 @@ section 7):
    }
    ```
 
-2. **Score.** For each job, `show` the draft and check it against the scenario's
-   `must_include`, `must_not` and required checks. Record approve/reject in `review`; attach a
+2. **Score.** Score the run against every scenario's rubric with the deterministic scorer. It
+   links each mail job back to its scenario, then checks completion, required policies and
+   checks in the draft evidence, and forbidden phrases. `must_include` coverage is reported
+   as a hint only, because those entries describe intent:
+
+   ```powershell
+   uv run python scripts/score_round.py --since 2026-10-27T07:00:00+00:00 --label baseline-1
+   ```
+
+   It writes `artifacts/rounds/baseline-1.json`. Then `show` each draft and record
+   approve/reject in `review`; attach a
    corrected version and a reason when the draft was wrong:
 
    ```powershell
@@ -408,6 +417,9 @@ section 7):
    full release steps.
 7. **Refresh the test.** Once validation results have steered your changes, they stop being an
    unbiased test. Write new validation scenarios before claiming a final result.
+
+A complete worked round, with its numbers, the bugs it found and the decision, is in
+[evidence/ROUND_1_EVIDENCE.md](./evidence/ROUND_1_EVIDENCE.md).
 
 > **Do not let the agent grade itself.** The rubric lives in the scenario file and the
 > decision is a human `review`. Self-generated outputs are never training data on their own.
@@ -439,6 +451,6 @@ ignores. To archive an experiment, copy `artifacts/` aside before resetting.
 | Thunderbird asks for a password on every start | The password was entered without ticking **Use Password Manager**. Enter it once more and tick it. |
 | "Could not copy to Sent" when sending | The profile was set up by hand. Point Sent/Drafts at Local Folders, or rebuild it with the script. |
 | Intake creates no jobs | The mail is already read (Mark as Unread), was sent unauthenticated, or was sent to another persona. |
-| Jobs fail with "fixture not found" after a code change | The gateway holds old plugin code. Stop the `hermes_cli.main ... gateway run` process, then `hermes gateway ensure`, then `retry`. |
+| Jobs fail with "fixture not found", or a plugin/policy change has no effect on new drafts | The one host gateway runs the PersonaDesk tools and holds the old plugin code. Run `hermes gateway restart`, then replay or `retry`. |
 | New Outlook cannot add the account | Expected: it connects through Microsoft's cloud. Use Thunderbird. |
 | The email-gateway assistant ignores a sender | Add the sender to `EMAIL_ALLOWED_USERS` and check that `EMAIL_AUTHSERV_ID=mailsim.personadesk.test`. |

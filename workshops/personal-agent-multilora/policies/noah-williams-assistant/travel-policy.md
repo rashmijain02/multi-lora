@@ -1,9 +1,11 @@
 ---
 id: travel-policy
-version: 1
+version: 2
 owner: noah-williams-assistant
 parameters:
   business_class_min_flight_hours: 6
+  internal_domains: [company.example]
+  pickup_channel: company travel desk
   max_fare:
     economy: 900
     premium_economy: 1300
