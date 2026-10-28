@@ -12,7 +12,8 @@ Work through the stages in order. Each stage produces something the next one use
 | 2. Workshop 1, part A | Train and compare classification adapters | Stage 1 concepts | CPU is enough for the 0.5B default; a GPU is faster |
 | 3. Workshop 1, part B | Train and evaluate persona reply adapters | Stage 2 environment | GPU recommended |
 | 4. Workshop 2 | Run PersonaDesk persona agents on Hermes | Persona adapters from stage 3 as its writer (optional at first) | CPU with a hosted model; GPU for the full local stack |
-| 5. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–4 | — |
+| 5. Workshop 4 (optional) | Let a Hermes agent run guarded training experiments (AutoResearch) | Hermes concepts and the "agent never grades itself" rule from stage 4 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
+| 6. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–5 | — |
 
 ### Stage 1: Concepts (study kit)
 
@@ -74,7 +75,20 @@ Read in this order:
 6. [Email playground proposal](workshops/personal-agent-multilora/EMAIL_PLAYGROUND_PROPOSAL.md):
    an optional richer mailbox (Stalwart/JMAP) for later phases.
 
-### Stage 5: Decide
+### Stage 5: Workshop 4, AutoResearch
+
+[`workshops/autoresearch-spark`](workshops/autoresearch-spark/README.md) runs Karpathy's
+autoresearch loop with Hermes as the agent and a guard-rail harness as the grader. The agent edits
+only `train.py`. The metric is hash-locked, and each change is kept or reverted on a fixed time
+budget. A held-out test checks the final result. There are two tiers:
+
+- a **light tier** for a 10 GB consumer GPU with TinyStories, measured on an RTX 3080;
+- a **DGX Spark tier**.
+
+Workshop 3, which trains small task models on the Spark, is planned. Start with the
+[plan](workshops/autoresearch-spark/PLAN.md).
+
+### Stage 6: Decide
 
 Use the study-kit templates and the evidence from both workshops to make the decisions listed
 under [Intended result](#intended-result). For managed hosting, see the email workshop's
