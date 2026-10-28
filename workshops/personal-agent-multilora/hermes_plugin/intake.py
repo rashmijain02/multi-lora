@@ -82,11 +82,13 @@ def mail_fixture(root: Path, grant: PersonaGrant, msg: EmailMessage,
     seeded = str(msg.get(FIXTURE_HEADER, "")).strip()
     if seeded:
         try:
-            path = safe_child(root / "fixtures", grant.client_id, f"{seeded}.json")
+            # Base is the persona's own folder, so "../other-persona/x" cannot escape it.
+            path = safe_child(root / "fixtures" / grant.client_id, f"{seeded}.json")
             source = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
         except ValueError:
             source = None
-        if source and source.get("from", "").lower() == sender:
+        if source and source.get("client_id") == grant.client_id \
+                and source.get("from", "").lower() == sender:
             facts, received_at, as_of = source["facts"], source["received_at"], source["as_of"]
     return {
         "id": fixture_id, "client_id": grant.client_id, "version": 1, "split": "mail",

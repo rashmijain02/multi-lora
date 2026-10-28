@@ -145,7 +145,8 @@ def _dispatch(cc: CommandContext, args: argparse.Namespace) -> int:
         if len(source_key) > permissions.max_task_chars:
             raise ValueError("source key too long.")
         job, created = _create_job(cc, store, grant, fixture.id, args.task, source_key)
-        if created and not args.no_execute:
+        # Also run an existing job left queued (--no-execute earlier, or a busy lock).
+        if job["status"] == "queued" and not args.no_execute:
             job = run_job(store=store, job=job, grant=grant, permissions=permissions,
                           hermes_bin=cc.hermes_bin, lock_dir=lock_dir)
         _emit(cc, {"ok": job["status"] != "failed", "created": created, "job": job,
@@ -173,7 +174,7 @@ def _dispatch(cc: CommandContext, args: argparse.Namespace) -> int:
                     :permissions.max_task_chars]
                 job, created = _create_job(cc, store, grant, fixture_id, "draft_reply",
                                            source_key)
-                if created and args.run:
+                if args.run and job["status"] == "queued":
                     job = run_job(store=store, job=job, grant=grant, permissions=permissions,
                                   hermes_bin=cc.hermes_bin, lock_dir=lock_dir)
                 results.append({"uid": int(item.uid), "from": item.sender,
@@ -216,7 +217,8 @@ def _dispatch(cc: CommandContext, args: argparse.Namespace) -> int:
 
     if command == "retry":
         job = _owned_job(store, args.job, grant.client_id)
-        store.transition(job["job_id"], "queued")
+        if job["status"] != "queued":
+            store.transition(job["job_id"], "queued")
         job = run_job(store=store, job=store.get_job(job["job_id"]), grant=grant,
                       permissions=permissions, hermes_bin=cc.hermes_bin, lock_dir=lock_dir)
         _emit(cc, {"ok": job["status"] != "failed", "job": job})

@@ -126,7 +126,11 @@ def brief_from_checks(fixture: Fixture, results: list[dict[str, Any]]) -> tuple[
             if outcome == "unknown_plan":
                 uncertain.append("Customer plan unknown; SLA not determined.")
         elif name == "refund_eligibility":
-            if outcome == "eligible":
+            if outcome == "eligible" and r["route"] == "billing_lead":
+                brief.append(f"The ${r['amount']:.2f} charge is within the {r['window_days']}-day "
+                             "refund window but above what support can recommend; forwarded "
+                             "to the billing lead for a decision.")
+            elif outcome == "eligible":
                 brief.append(f"The ${r['amount']:.2f} charge is within the {r['window_days']}-day "
                              "refund window; refund recommended to the billing team, who process "
                              "all refunds and review within two business days.")

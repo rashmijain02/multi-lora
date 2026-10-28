@@ -58,6 +58,15 @@ def test_travel_policy_keeps_itinerary_internal_for_external_senders(root, db):
     assert check(root, db, "pd-noah", "travel_policy", "noah-001")["outcome"] == "not_applicable"
 
 
+def test_refund_above_l1_limit_goes_to_billing_lead():
+    from hermes_plugin.tools import brief_from_checks
+
+    result = {"check": "refund_eligibility", "outcome": "eligible", "amount": 1200.0,
+              "window_days": 30, "route": "billing_lead"}
+    brief, _ = brief_from_checks(None, [result])
+    assert "billing lead for a decision" in brief[0] and "recommended" not in brief[0]
+
+
 def test_unknown_check_is_invalid(root, db):
     result = call(runtime(root, db, "pd-noah"), "pd_run_check", check="rm -rf",
                   fixture_id="noah-001")

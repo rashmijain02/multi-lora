@@ -178,6 +178,18 @@ def test_retry_after_failure(root, db, capsys, monkeypatch):
     assert out["job"]["error"] is None
 
 
+def test_queued_job_is_not_stuck(root, db, capsys):
+    _, out = cli(capsys, "pd-noah", "--state-db", str(db), "run", "--fixture", "noah-001",
+                 "--no-execute")
+    assert out["job"]["status"] == "queued"
+    code, out = cli(capsys, "pd-noah", "--state-db", str(db), "run", "--fixture", "noah-001")
+    assert code == 0 and out["created"] is False and out["job"]["status"] == "awaiting_review"
+    _, out = cli(capsys, "pd-noah", "--state-db", str(db), "run", "--fixture", "noah-002",
+                 "--no-execute")
+    code, out = cli(capsys, "pd-noah", "--state-db", str(db), "retry", out["job"]["job_id"])
+    assert code == 0 and out["job"]["status"] == "awaiting_review"
+
+
 def test_timeout_fails_the_job(root, db, monkeypatch):
     monkeypatch.setenv("FAKE_HERMES_MODE", "sleep")
     permissions = dataclasses.replace(load_permissions(root), worker_timeout_seconds=3)

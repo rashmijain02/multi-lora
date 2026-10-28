@@ -140,6 +140,23 @@ def test_intake_run_drafts_free_form_mail_and_rejects_unauthenticated(root, db, 
     assert rejected["rejected"] == "sender not authenticated by mailsim"
 
 
+def test_seed_header_cannot_pull_another_personas_fixture(root):
+    from datetime import UTC, datetime
+    from email.message import EmailMessage
+
+    from hermes_plugin.intake import load_mailboxes, mail_fixture
+    from hermes_plugin.permissions import load_permissions
+
+    grant = load_permissions(root).personas["priya-raman-support"]
+    msg = EmailMessage()
+    msg["From"], msg["To"] = "maya.assistant-request@company.example", PRIYA
+    msg["Message-ID"], msg["Subject"] = "<x@company.example>", "Board prep call Thursday 10:00"
+    msg["X-PersonaDesk-Fixture"] = "../noah-williams-assistant/noah-001"
+    msg.set_content("hi")
+    fixture = mail_fixture(root, grant, msg, load_mailboxes(root), datetime.now(UTC))
+    assert "busy" not in fixture["facts"] and "Investor" not in json.dumps(fixture)
+
+
 def _load_setup_thunderbird():
     import importlib.util
 
