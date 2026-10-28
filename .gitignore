@@ -26,3 +26,6 @@ workshops/email-multilora/data/manual_full_response/*
 !workshops/email-multilora/data/manual_full_response/README.md
 !workshops/email-multilora/data/manual_full_response/MANIFEST.json
 !workshops/email-multilora/data/manual_full_response/[0-9][0-9]-*-email-responses.csv
+workshops/personal-agent-multilora/artifacts/
+workshops/personal-agent-multilora/config/operators.json
+workshops/personal-agent-multilora/config/runtime-lock.json

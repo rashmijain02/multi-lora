@@ -1,0 +1,31 @@
+{
+  "_comment": "Copy to config/runtime-lock.json (ignored by Git) and fill in what you actually installed. Never record checkout paths.",
+  "machine_profile": "dgx-spark | rtx-3080-10gb | other",
+  "hermes": {"repository": "NousResearch/hermes-agent", "commit": "", "plugin_version": "0.1.0"},
+  "controller": {
+    "runtime": "llama.cpp | vllm",
+    "runtime_version": "",
+    "model_id": "Qwen/Qwen3-4B-Instruct-2507",
+    "model_revision": "",
+    "artifact": "",
+    "artifact_sha256": "",
+    "context_tokens": 65536,
+    "endpoint": "http://127.0.0.1:8080/v1"
+  },
+  "writer": {
+    "backend": "peft | vllm",
+    "base_model_id": "",
+    "base_model_revision": "",
+    "adapters": {},
+    "endpoint": "http://127.0.0.1:8100"
+  },
+  "classifier": {
+    "backend": "lexical | clm",
+    "clm_commit": "7fdefde7c70b944b7a5dbb4513785aef12c4dac1",
+    "encoder": "Qwen/Qwen3-8B",
+    "encoder_runtime": "vllm-bf16 | llama.cpp-q8_0",
+    "head_sha256": "",
+    "endpoint": "http://127.0.0.1:8700"
+  },
+  "measured": {"peak_ram_gb": null, "peak_vram_gb": null, "controller_tokens_per_second": null}
+}

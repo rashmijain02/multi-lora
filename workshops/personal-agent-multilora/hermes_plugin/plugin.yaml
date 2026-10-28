@@ -1,0 +1,18 @@
+name: personadesk
+version: 0.1.0
+description: >-
+  PersonaDesk workshop plugin. Persona-scoped fixture, policy, check, draft, and optional
+  classification tools; operator run/status/review commands; a pre_tool_call guard.
+author: PersonaDesk workshop
+provides_tools:
+  - pd_read_fixture
+  - pd_get_policy
+  - pd_run_check
+  - pd_draft_reply
+  - pd_classify_message
+provides_hooks:
+  - pre_tool_call
+python_dependencies:
+  # Both ship with Hermes; the plugin adds nothing to the Hermes environment.
+  - requests>=2.32,<3
+  - ruamel.yaml>=0.18,<0.19

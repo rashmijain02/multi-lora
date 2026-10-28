@@ -1,0 +1,6 @@
+{
+  "_comment": "Copy to config/operators.json (ignored by Git). Map each local OS account name to the personas it may operate.",
+  "operators": {
+    "your-os-username": ["priya-raman-support", "daniel-okafor-cfo", "noah-williams-assistant"]
+  }
+}

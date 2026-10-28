@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "personadesk-workshop"
+version = "0.1.0"
+description = "PersonaDesk: a Hermes plugin for persona-scoped drafting with reviewed releases"
+requires-python = ">=3.11,<3.15"
+# The plugin runs inside the Hermes environment, so its runtime dependencies stay minimal.
+dependencies = ["requests>=2.32,<3", "ruamel.yaml>=0.18,<0.19"]
+
+[project.optional-dependencies]
+# Offline classification baselines (K0/K7) and evaluation; not needed by the plugin.
+classification = ["numpy>=1.26,<3", "scikit-learn>=1.5,<2"]
+# Loopback writer service wrapping the email workshop's PEFT backend.
+writer = ["fastapi>=0.115,<1", "uvicorn>=0.34,<1"]
+dev = ["pytest>=8,<10", "ruff>=0.15,<1"]
+
+[project.scripts]
+personadesk = "hermes_plugin.commands:main"
+pd-mail = "mailsim.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["hermes_plugin*", "mailsim*"]
+
+[tool.setuptools.package-data]
+hermes_plugin = ["plugin.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

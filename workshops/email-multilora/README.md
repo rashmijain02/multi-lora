@@ -13,6 +13,19 @@ adapter evaluation, multiple-adapter planning, and optional vLLM-Metal/LAN
 inference. It uses a separate 4B Nemotron-H base and MLX runtime; it does not
 replace the existing PEFT pipeline or claim automatic adapter interoperability.
 
+The next workshop, [PersonaDesk: self-hosted personal agents](../personal-agent-multilora/README.md),
+uses these personas and response adapters (start with its
+[user guide](../personal-agent-multilora/docs/USER_GUIDE.md); design in the
+[proposal](../personal-agent-multilora/PROPOSAL.md)).
+It uses Hermes as the only agent framework, with a PersonaDesk plugin, Multi-LoRA draft
+writing, and human-reviewed learning. The plugin, review CLI, and local mail simulator are
+implemented; GPU stages still have hardware qualification gates.
+V1 is self-hosted; V2 plans to host the same custom Hermes harness in Azure Foundry Agent
+Service, with separately qualified managed model and adapter inference.
+Its classification extension adds CLMClient typed choices, projection-head training, and
+calibration/robustness comparisons without conflating the CLM six-class taxonomy with this
+workshop's ten-label task.
+
 New to the source? Read the [code companion](docs/CODE_COMPANION.md) for a guided tour of
 the dataset, router, LoRA training, adapter switching, evaluation, pipeline, tests and
 separate Azure hosting path.

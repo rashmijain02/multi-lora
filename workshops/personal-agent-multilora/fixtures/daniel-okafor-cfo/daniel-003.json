@@ -1,0 +1,24 @@
+{
+  "id": "daniel-003",
+  "client_id": "daniel-okafor-cfo",
+  "version": 1,
+  "split": "validation",
+  "source_event_id": "fixture:daniel-003",
+  "from": "facilities@company.example",
+  "subject": "Office chairs order",
+  "body": "Hi Daniel,\n\nThe chair order from Fabrikam came in at $2,980.00, matching PO-3350 exactly. Okay to proceed to payment under the normal process?\n\nFacilities",
+  "received_at": "2026-10-20T13:00:00Z",
+  "as_of": "2026-10-20T14:00:00Z",
+  "facts": {
+    "invoice_amount": 2980.0,
+    "po_amount": 2980.0,
+    "currency": "USD",
+    "vendor_verified": true
+  },
+  "expected": {
+    "required_checks": ["invoice_po_match", "approval_threshold"],
+    "required_policies": ["finance-approvals"],
+    "must_not": ["state the payment was made"],
+    "must_include": ["match confirmed", "standard approval route"]
+  }
+}

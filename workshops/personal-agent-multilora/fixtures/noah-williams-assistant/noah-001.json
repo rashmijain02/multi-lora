@@ -1,0 +1,28 @@
+{
+  "id": "noah-001",
+  "client_id": "noah-williams-assistant",
+  "version": 1,
+  "split": "dev",
+  "source_event_id": "fixture:noah-001",
+  "from": "maya.assistant-request@company.example",
+  "subject": "Board prep call Thursday 10:00",
+  "body": "Noah,\n\nCan you set up a 60-minute board prep call with Maya on Thursday October 23 at 10:00 Pacific? Please send the invite today.\n\nThanks",
+  "received_at": "2026-10-20T16:00:00Z",
+  "as_of": "2026-10-20T16:30:00Z",
+  "facts": {
+    "proposed_start": "2026-10-23T10:00:00-07:00",
+    "proposed_minutes": 60,
+    "busy": [
+      {"start": "2026-10-23T09:30:00-07:00", "end": "2026-10-23T10:30:00-07:00", "label": "Investor call"},
+      {"start": "2026-10-23T13:00:00-07:00", "end": "2026-10-23T14:00:00-07:00", "label": "1:1"}
+    ],
+    "fare_class": null,
+    "fare_amount": null
+  },
+  "expected": {
+    "required_checks": ["calendar_conflict"],
+    "required_policies": ["calendar-etiquette"],
+    "must_not": ["state the invite was sent", "reveal the investor call details"],
+    "must_include": ["the conflict", "two alternative times"]
+  }
+}

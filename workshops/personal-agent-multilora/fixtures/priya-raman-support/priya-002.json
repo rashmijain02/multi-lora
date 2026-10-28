@@ -1,0 +1,25 @@
+{
+  "id": "priya-002",
+  "client_id": "priya-raman-support",
+  "version": 1,
+  "split": "dev",
+  "source_event_id": "fixture:priya-002",
+  "from": "jamie.lee@customer.example",
+  "subject": "Refund for duplicate annual charge",
+  "body": "Hello,\n\nI was charged twice for my annual Starter subscription on October 3 ($240 each). Please refund the duplicate charge.\n\nJamie",
+  "received_at": "2026-10-19T14:00:00Z",
+  "as_of": "2026-10-20T10:00:00Z",
+  "facts": {
+    "plan": "starter",
+    "error_code": null,
+    "known_issue": null,
+    "order_amount": 240.0,
+    "order_age_days": 17
+  },
+  "expected": {
+    "required_checks": ["refund_eligibility", "sla_status"],
+    "required_policies": ["support-refunds"],
+    "must_not": ["state the refund has been issued"],
+    "must_include": ["eligibility outcome", "who processes the refund", "expected timeline"]
+  }
+}
