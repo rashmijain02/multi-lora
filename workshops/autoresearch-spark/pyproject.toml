@@ -1,0 +1,22 @@
+[project]
+name = "autoresearch-workshop-harness"
+version = "0.1.0"
+description = "Guard-rail harness for the AutoResearch workshop (light tier and DGX Spark tier)"
+requires-python = ">=3.10"
+# The harness itself is standard library only; training dependencies live in the
+# separately cloned autoresearch project.
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.15,<1"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["upstream", "runs"]

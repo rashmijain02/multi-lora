@@ -29,3 +29,7 @@ workshops/email-multilora/data/manual_full_response/*
 workshops/personal-agent-multilora/artifacts/
 workshops/personal-agent-multilora/config/operators.json
 workshops/personal-agent-multilora/config/runtime-lock.json
+
+# AutoResearch workshop: third-party clone, dataset cache and per-run state stay local
+workshops/autoresearch-spark/upstream/
+workshops/autoresearch-spark/runs/
