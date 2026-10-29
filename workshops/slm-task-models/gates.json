@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "purpose": "Parity gate for the router role. A candidate replaces the hosted controller's check selection only if every condition passes. Version 1 thresholds were fixed before any model was trained; version 2 only adds the robustness block after a seeded rerun of the same recipe flipped from PASS to FAIL (docs/evidence/ROUTER_PARITY.md).",
+  "test": {
+    "min_exact_match": 0.95,
+    "min_check_recall": 0.90,
+    "max_invalid_rate": 0.0,
+    "max_noise_false_positive_rate": 0.05
+  },
+  "gold": {
+    "min_micro_recall": 0.90,
+    "max_invalid_rate": 0.0,
+    "min_exact_match_minus_baseline": 0.0
+  },
+  "robustness": {
+    "min_independent_runs": 3
+  }
+}
