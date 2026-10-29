@@ -12,8 +12,9 @@ Work through the stages in order. Each stage produces something the next one use
 | 2. Workshop 1, part A | Train and compare classification adapters | Stage 1 concepts | CPU is enough for the 0.5B default; a GPU is faster |
 | 3. Workshop 1, part B | Train and evaluate persona reply adapters | Stage 2 environment | GPU recommended |
 | 4. Workshop 2 | Run PersonaDesk persona agents on Hermes | Persona adapters from stage 3 as its writer (optional at first) | CPU with a hosted model; GPU for the full local stack |
-| 5. Workshop 4 (optional) | Let a Hermes agent run guarded training experiments (AutoResearch) | Hermes concepts and the "agent never grades itself" rule from stage 4 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
-| 6. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–5 | — |
+| 5. Workshop 3 (optional) | Train a small model to take over one hosted agent role (the router), behind a parity gate | PersonaDesk checks, fixtures and cost model from stage 4; the 0.5B LoRA recipe from stage 2 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
+| 6. Workshop 4 (optional) | Let a Hermes agent run guarded training experiments (AutoResearch) | Hermes concepts and the "agent never grades itself" rule from stage 4 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
+| 7. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–6 | — |
 
 ### Stage 1: Concepts (study kit)
 
@@ -75,7 +76,22 @@ Read in this order:
 6. [Email playground proposal](workshops/personal-agent-multilora/EMAIL_PLAYGROUND_PROPOSAL.md):
    an optional richer mailbox (Stalwart/JMAP) for later phases.
 
-### Stage 5: Workshop 4, AutoResearch
+### Stage 5: Workshop 3, small task models
+
+[`workshops/slm-task-models`](workshops/slm-task-models/README.md) asks whether a small model
+trained for one narrow task can replace the hosted frontier model on that task. The first role is
+the **router**, which picks the PersonaDesk policy checks an email needs. You build:
+
+- a synthetic teacher dataset with a held-out test split;
+- a TF-IDF baseline;
+- a Qwen2.5-0.5B LoRA student on a 10 GB GPU;
+- a hash-locked parity gate that every independent training run must pass.
+
+Start with the [plan](workshops/slm-task-models/PLAN.md). The measured rounds are in the
+[evidence report](workshops/slm-task-models/docs/evidence/ROUTER_PARITY.md). The judge and the
+controller are planned next.
+
+### Stage 6: Workshop 4, AutoResearch
 
 [`workshops/autoresearch-spark`](workshops/autoresearch-spark/README.md) runs Karpathy's
 autoresearch loop with Hermes as the agent and a guard-rail harness as the grader. The agent edits
@@ -85,12 +101,11 @@ budget. A held-out test checks the final result. There are two tiers:
 - a **light tier** for a 10 GB consumer GPU with TinyStories, measured on an RTX 3080;
 - a **DGX Spark tier**.
 
-Workshop 3, which trains small task models on the Spark, is planned. Start with the
-[plan](workshops/autoresearch-spark/PLAN.md).
+Start with the [plan](workshops/autoresearch-spark/PLAN.md).
 
-### Stage 6: Decide
+### Stage 7: Decide
 
-Use the study-kit templates and the evidence from both workshops to make the decisions listed
+Use the study-kit templates and the evidence from the workshops to make the decisions listed
 under [Intended result](#intended-result). For managed hosting, see the email workshop's
 [Azure deployment guide](workshops/email-multilora/docs/AZURE_DEPLOYMENT.md).
 

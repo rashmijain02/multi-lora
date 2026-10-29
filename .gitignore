@@ -33,3 +33,5 @@ workshops/personal-agent-multilora/config/runtime-lock.json
 # AutoResearch workshop: third-party clone, dataset cache and per-run state stay local
 workshops/autoresearch-spark/upstream/
 workshops/autoresearch-spark/runs/
+# SLM task-models workshop: generated data, adapters and predictions stay local
+workshops/slm-task-models/runs/

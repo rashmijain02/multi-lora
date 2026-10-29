@@ -430,7 +430,7 @@ the held-out score at the end.
 | --- | --- | --- |
 | 1. Email Multi-LoRA | Persona and classification LoRA adapters, plus an evaluation | Part B-lite optimises its LoRA recipe |
 | 2. PersonaDesk on Hermes | Hermes profiles and approvals, a deterministic scorer, hill climbing, a cost model | The same Hermes concepts; the same "agent never grades itself"; a cost line per improvement |
-| 3. Small task models on the Spark (planned) | Distilled controller, router, judge and writer models with parity gates | Part B optimises its training recipe under a locked parity metric |
+| 3. Small task models ([`slm-task-models`](../slm-task-models/PLAN.md)) | A router student behind a hash-locked parity gate; judge and controller planned | Part B optimises its training recipe under a locked parity metric |
 | **4. AutoResearch (this one)** | A method for letting an agent tune training safely | Can run under Workshop 3 to find better small-model recipes |
 
 ## 12. What the harness enforces, and what it cannot
