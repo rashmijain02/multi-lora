@@ -1,0 +1,22 @@
+{
+  "persona": "marcus-green-legal",
+  "display_name": "Marcus Green",
+  "role": "Legal counsel",
+  "hermes_profile": "pd-marcus",
+  "release": "planned",
+  "panels": [
+    "evidence-table",
+    "checklist",
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "evidence-table",
+  "style": {
+    "accent": "#1c2b4a",
+    "density": "comfortable",
+    "font": "serif",
+    "contrast": "normal"
+  },
+  "intent": "Formal"
+}

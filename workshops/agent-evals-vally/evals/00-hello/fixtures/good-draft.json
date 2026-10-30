@@ -1,0 +1,11 @@
+{
+  "output": "Hello Jamie, the $240.00 charge is within the 30-day refund window; refund recommended to the billing team, who process all refunds and review within two business days.",
+  "events": [
+    {"type": "turn_start", "data": {"turnId": "0"}},
+    {"type": "tool_call", "data": {"toolName": "pd_read_fixture", "toolCallId": "c1", "arguments": {"fixture_id": "priya-002"}}},
+    {"type": "tool_result", "data": {"toolName": "pd_read_fixture", "toolCallId": "c1", "success": true}},
+    {"type": "tool_call", "data": {"toolName": "pd_draft_reply", "toolCallId": "c2", "arguments": {"fixture_id": "priya-002"}}},
+    {"type": "tool_result", "data": {"toolName": "pd_draft_reply", "toolCallId": "c2", "success": true}},
+    {"type": "turn_end", "data": {"turnId": "0"}}
+  ]
+}

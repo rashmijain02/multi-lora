@@ -1,0 +1,21 @@
+{
+  "persona": "sofia-alvarez-operations",
+  "display_name": "Sofia Alvarez",
+  "role": "Operations manager",
+  "hermes_profile": "pd-sofia",
+  "release": "planned",
+  "panels": [
+    "timeline",
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "timeline",
+  "style": {
+    "accent": "#8a5a00",
+    "density": "compact",
+    "font": "sans",
+    "contrast": "normal"
+  },
+  "intent": "Status colours"
+}

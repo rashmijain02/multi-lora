@@ -1,0 +1,21 @@
+{
+  "persona": "jordan-lee-people-ops",
+  "display_name": "Jordan Lee",
+  "role": "People operations",
+  "hermes_profile": "pd-jordan",
+  "release": "planned",
+  "panels": [
+    "checklist",
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "checklist",
+  "style": {
+    "accent": "#6b4fa0",
+    "density": "comfortable",
+    "font": "sans",
+    "contrast": "high"
+  },
+  "intent": "Soft, accessible"
+}

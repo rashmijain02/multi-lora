@@ -1,0 +1,22 @@
+{
+  "persona": "lucas-silva-engineer",
+  "display_name": "Lucas Silva",
+  "role": "Software engineer",
+  "hermes_profile": "pd-lucas",
+  "release": "planned",
+  "panels": [
+    "checklist",
+    "evidence-table",
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "checklist",
+  "style": {
+    "accent": "#2d3748",
+    "density": "compact",
+    "font": "mono",
+    "contrast": "normal"
+  },
+  "intent": "Developer, monospace"
+}

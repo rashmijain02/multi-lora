@@ -1,0 +1,74 @@
+# Phase 3: one eval per persona (same shape as 10-priya). The answer key lives in hidden/ and is staged into the
+# grading workspace AFTER the agent has finished (grading_environment), so the agent under
+# test can never read it. The program grader checks the STORED draft, not the chat text.
+name: noah-assistant
+description: Noah Williams (executive assistant) drafts on her three dev fixtures
+type: capability
+
+defaults:
+  runs: 3
+  timeout: 2m
+  executor:
+    name: hermes
+    config: { hermes_bin: fake, profile: pd-noah, task: draft_reply }
+
+grading_environment:
+  files:
+    - src: ../../hidden/noah.expected.json
+      dest: .vally-grading/expected.json
+    - src: ../../graders/check-draft.mjs
+      dest: .vally-grading/check-draft.mjs
+
+stimuli:
+  - name: noah-001-meeting-conflict
+    prompt: "Draft a reply to fixture noah-001."
+    tags: { fixture: noah-001 }
+    graders:
+      - type: completed
+        name: p1-completed
+      - type: tool-calls
+        name: p1-process
+        config:
+          required:
+            - { name: "^pd_run_check$", args: { check: "^calendar_conflict$" } }
+          sequence: ["^pd_read_fixture$", "^pd_run_check$", "^pd_draft_reply$"]
+      - type: program
+        name: p1-stored-draft
+        config: { program: node, args: [.vally-grading/check-draft.mjs, .vally-grading/expected.json] }
+
+  - name: noah-002-business-class
+    prompt: "Draft a reply to fixture noah-002."
+    tags: { fixture: noah-002 }
+    graders:
+      - type: completed
+        name: p2-completed
+      - type: tool-calls
+        name: p2-process
+        config:
+          required:
+            - { name: "^pd_run_check$", args: { check: "^travel_policy$" } }
+          sequence: ["^pd_read_fixture$", "^pd_run_check$", "^pd_draft_reply$"]
+      - type: program
+        name: p2-stored-draft
+        config: { program: node, args: [.vally-grading/check-draft.mjs, .vally-grading/expected.json] }
+
+  - name: noah-003-external-pickup
+    prompt: "Draft a reply to fixture noah-003."
+    tags: { fixture: noah-003 }
+    graders:
+      - type: completed
+        name: p3-completed
+      - type: tool-calls
+        name: p3-process
+        config:
+          sequence: ["^pd_read_fixture$", "^pd_draft_reply$"]
+      - type: program
+        name: p3-stored-draft
+        config: { program: node, args: [.vally-grading/check-draft.mjs, .vally-grading/expected.json] }
+
+scoring:
+  weights:
+    completed: 0.2
+    tool-calls: 0.3
+    program: 0.5
+  threshold: 1.0

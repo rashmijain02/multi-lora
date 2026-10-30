@@ -1,0 +1,27 @@
+{
+  "name": "agent-evals-vally",
+  "private": true,
+  "type": "module",
+  "description": "Workshop 6: evaluating Hermes agents with Vally",
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "scripts": {
+    "test": "node --test \"vally-hermes-executor/tests/*.test.js\" \"graders/tests/*.test.js\"",
+    "vally": "node scripts/vally.mjs",
+    "lint:evals": "node scripts/vally.mjs lint --eval-spec evals",
+    "lint:broken": "node scripts/vally.mjs lint --eval-spec lessons/broken/eval.yaml",
+    "eval:hello": "node scripts/vally.mjs eval --eval-spec evals/00-hello/eval.yaml",
+    "eval:fake": "node scripts/vally.mjs eval --executor-plugin vally-hermes-executor --workers 1 --eval-spec evals/01-fake/eval.yaml",
+    "eval:priya": "node scripts/vally.mjs eval --executor-plugin vally-hermes-executor --workers 1 --eval-spec evals/10-priya/eval.yaml",
+    "eval:daniel": "node scripts/vally.mjs eval --executor-plugin vally-hermes-executor --workers 1 --eval-spec evals/11-daniel/eval.yaml",
+    "eval:noah": "node scripts/vally.mjs eval --executor-plugin vally-hermes-executor --workers 1 --eval-spec evals/12-noah/eval.yaml",
+    "eval:safety": "node scripts/vally.mjs eval --executor-plugin vally-hermes-executor --workers 1 --eval-spec evals/20-safety/eval.yaml",
+    "eval:safety:control": "node scripts/vally.mjs eval --eval-spec evals/20-safety/controls/eval.yaml"
+  },
+  "devDependencies": {
+    "@microsoft/vally": "0.20.0",
+    "@microsoft/vally-cli": "0.20.0",
+    "vally-hermes-executor": "file:vally-hermes-executor"
+  }
+}
