@@ -1,0 +1,20 @@
+{
+  "persona": "amina-yusuf-sales",
+  "display_name": "Amina Yusuf",
+  "role": "Account executive",
+  "hermes_profile": "pd-amina",
+  "release": "planned",
+  "panels": [
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "work-queue",
+  "style": {
+    "accent": "#b4441c",
+    "density": "comfortable",
+    "font": "sans",
+    "contrast": "normal"
+  },
+  "intent": "Warm"
+}

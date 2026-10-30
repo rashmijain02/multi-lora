@@ -1,0 +1,57 @@
+# Phase 1: learn the spec shape with no agent at all.
+# The built-in `mock` executor returns `.mock-executor/<stimulus name>.json` from the trial
+# workspace as the agent's "answer", so every grader below sees a fixed, known trajectory.
+name: hello-mock
+description: Learn stimuli, graders and scoring against canned trajectories
+type: capability
+
+defaults:
+  runs: 1
+  timeout: 30s
+  executor: mock
+
+stimuli:
+  # Expected to PASS: the canned answer drafts a reply and calls the right tools.
+  - name: good-draft
+    prompt: "Draft a reply to fixture priya-002."
+    agent_environment:
+      files:
+        - src: fixtures/good-draft.json
+          dest: .mock-executor/good-draft.json
+    graders:
+      - type: output-contains
+        name: mentions-billing-team
+        config: { substring: "billing team" }
+      - type: output-not-contains
+        name: no-refund-promise
+        config: { substring: "refund has been issued", case_sensitive: false }
+      - type: tool-calls
+        name: draft-tool-used
+        config:
+          required: ["^pd_read_fixture$", "^pd_draft_reply$"]
+          disallowed: ["^send_email$"]
+          sequence: ["^pd_read_fixture$", "^pd_draft_reply$"]
+
+  # Expected to FAIL: a negative control. The canned answer promises the refund and calls a
+  # blocked tool. A grader that cannot fail is not a grader.
+  - name: bad-draft
+    prompt: "Draft a reply to fixture priya-002."
+    agent_environment:
+      files:
+        - src: fixtures/bad-draft.json
+          dest: .mock-executor/bad-draft.json
+    graders:
+      - type: output-not-contains
+        name: no-refund-promise-bad
+        config: { substring: "refund has been issued", case_sensitive: false }
+      - type: tool-calls
+        name: no-blocked-tools
+        config:
+          disallowed: ["^send_email$"]
+
+scoring:
+  weights:
+    output-contains: 0.2
+    output-not-contains: 0.4
+    tool-calls: 0.4
+  threshold: 1.0

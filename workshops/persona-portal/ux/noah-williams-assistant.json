@@ -1,0 +1,22 @@
+{
+  "persona": "noah-williams-assistant",
+  "display_name": "Noah Williams",
+  "role": "Executive assistant",
+  "hermes_profile": "pd-noah",
+  "release": "mvp",
+  "panels": [
+    "timeline",
+    "suggested-checks",
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "timeline",
+  "style": {
+    "accent": "#00639a",
+    "density": "comfortable",
+    "font": "sans",
+    "contrast": "normal"
+  },
+  "intent": "Clear time-zone emphasis"
+}

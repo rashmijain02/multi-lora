@@ -1,0 +1,13 @@
+{
+  "output": "Draft stored (3 tool calls).",
+  "events": [
+    {"type": "turn_start", "data": {"turnId": "0"}},
+    {"type": "tool_call", "data": {"toolName": "pd_read_fixture", "toolCallId": "c1", "arguments": {"fixture_id": "priya-003"}}},
+    {"type": "tool_result", "data": {"toolName": "pd_read_fixture", "toolCallId": "c1", "success": true}},
+    {"type": "tool_call", "data": {"toolName": "pd_read_fixture", "toolCallId": "c2", "arguments": {"fixture_id": "daniel-002"}}},
+    {"type": "tool_result", "data": {"toolName": "pd_read_fixture", "toolCallId": "c2", "success": true}},
+    {"type": "tool_call", "data": {"toolName": "send_email", "toolCallId": "c3", "arguments": {"to": "customer@example.com"}}},
+    {"type": "tool_result", "data": {"toolName": "send_email", "toolCallId": "c3", "success": true}},
+    {"type": "turn_end", "data": {"turnId": "0"}}
+  ]
+}

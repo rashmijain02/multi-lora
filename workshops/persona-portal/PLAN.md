@@ -1,7 +1,9 @@
 # Workshop 5 plan: PersonaDesk Portal — a managed, personalised Hermes experience per persona
 
-Status: **plan only — nothing in this document is built or measured yet.** Every number in
-this workshop must come from a run recorded in `docs/evidence/`; none appear here.
+Status: **phases 1 and 2 (extension + sidecar) built and tested locally; phases 0 and 3–7
+not started.** What was built and what was measured is in [`README.md`](README.md) and
+[`docs/VERIFY.md`](docs/VERIFY.md). Every number in this workshop must come from a run
+recorded in `docs/` or `docs/evidence/`; none appear in this plan.
 
 This workshop turns the ten fictional Example Co. personas from Workshop 2 into ten
 *customers* of a small managed service. Each customer gets their own Hermes agent, their
@@ -15,54 +17,66 @@ It builds on:
 - **Workshop 3 (small task models)** — the router student and its parity gate; the
   Foundry-versus-local cost comparison ([`../slm-task-models/`](../slm-task-models/)).
 - **The Hermes source** pinned as a submodule at [`../../external/hermes-agent`](../../external/hermes-agent).
-  Read its `AGENTS.md`, `SECURITY.md`, and `website/docs/user-guide/features/web-dashboard.md`
-  and `extending-the-dashboard.md` alongside this plan.
+  Read its `AGENTS.md` and `SECURITY.md` alongside this plan.
+- **Hermes WebUI**, through our fork, pinned as a submodule at
+  [`../../external/hermes-webui`](../../external/hermes-webui). Read its `AGENTS.md`,
+  `ARCHITECTURE.md`, `THEMES.md`, `docs/EXTENSIONS.md` and `docs/CONTRACTS.md`.
 
 ---
 
 ## 1. What you will learn
 
 1. Why Hermes is a **single-tenant** agent and what that forces on a multi-customer design.
-2. How to personalise the Hermes **web dashboard** with *themes* and *dashboard plugins*
-   instead of forking it, and when a fork would actually be justified.
+2. How to personalise **Hermes WebUI** with *skins* and *extensions*, developed on our own
+   fork so we can learn freely and still merge upstream changes later.
 3. How to keep **provider keys out of customer reach** with a metering model gateway.
 4. How to run **one isolated Hermes per customer** and route each login to the right one.
 5. How to prove isolation, guard behaviour, and cost with tests and measured evidence.
 
 ---
 
-## 2. Key decision: extend the official dashboard, do not fork it
+## 2. Key decision: Hermes WebUI on our fork, personalised through extensions
 
-The original proposal suggested forking "the Hermes Web UI". Two different things share
-that name:
+The customer-facing surface is **Hermes WebUI**, developed on our fork
+`rashmijain02/hermes-webui` (MIT, forked from `nesquena/hermes-webui`). The official Hermes
+dashboard stays as an **operator console** only.
 
-| Option | What it is | Verdict |
+| | Hermes WebUI (our fork) | Official dashboard (`hermes dashboard`) |
 |---|---|---|
-| Community "Hermes Web UI" (Vue 3 / NaiveUI) | A separate third-party project | Not used. Unreviewed third-party code, and it tracks Hermes from outside. |
-| Official dashboard (`hermes dashboard`, `web/` in the submodule, React) | Ships with Hermes; embeds the real `hermes --tui` for chat | **Used**, extended rather than forked. |
+| Who it is for | End users: Claude-style chat, mobile/PWA | Operators: config, keys, analytics, logs |
+| Chat | Native streaming chat (SSE), runs on Windows, Linux, macOS | Embedded terminal over a POSIX PTY |
+| Frontend | Vanilla JavaScript, no build step, no framework | React + plugin SDK |
+| Personalisation | **Skins** (accent palette) + **extensions** (CSS/JS, nav, message actions, turn events, loopback sidecar) | Themes, typed slots, page overrides, plugin API routes |
+| Users | Single user | Single user |
+| Role in this workshop | **Customer UX** | Operator console (optional) |
 
-The official dashboard documentation states it "is built to be reskinned and extended
-without forking the codebase" through three drop-in layers:
+### Why a fork, and how we keep it mergeable
 
-| Layer | Where it lives | What we use it for |
-|---|---|---|
-| **Theme** (YAML) | `<HERMES_HOME>/dashboard-themes/<name>.yaml` | Each persona's colours, fonts and layout. |
-| **UI plugin** (`manifest.json` + one JS bundle) | `<HERMES_HOME>/plugins/<name>/dashboard/` | A persona *Workbench* tab, a home page override, page-scoped panels (`chat:top`, `sessions:top`, ...). |
-| **Backend plugin** (`plugin_api.py`, FastAPI `router`) | Same plugin folder | Read-only routes under `/api/plugins/<name>/` that feed the Workbench from PersonaDesk records. |
+The fork lets us learn and experiment freely without waiting for upstream review, while
+staying close enough to merge upstream releases later. Rules:
 
-Why not fork:
+1. All work happens on one fork branch, **`personadesk-portal`**. `master` on the fork mirrors
+   upstream only. The submodule in this repository tracks `personadesk-portal` once it is
+   pushed.
+2. **Extension first.** Anything expressible as an extension (skin CSS, injected JS, nav
+   action, message action, turn listener, sidecar) lives under `extensions/personadesk/` in
+   the fork. That directory is new, so upstream merges never conflict with it.
+3. **Core changes are small and labelled.** A change to WebUI core is allowed only when an
+   extension cannot do it. Each one is a separate commit whose message starts with
+   `core:`, is listed in `docs/GAPS.md` here, and is written as a candidate upstream PR
+   following the fork's `CONTRIBUTING.md` and `docs/CONTRACTS.md`.
+4. **Sync regularly.** Merge upstream `master` into `personadesk-portal` at least once per
+   phase; record the upstream commit in `docs/VERIFY.md`.
 
-- Hermes changes daily. A fork has to be rebased constantly, and its root `AGENTS.md` rejects
-  plugins that touch core files.
-- The dashboard rule "do not re-implement the primary chat experience in React" means a
-  fork would still embed the same terminal chat. A fork would not buy a different chat.
-- The PersonaDesk Hermes plugin can carry the dashboard extension in the **same plugin
-  folder**: one install covers tools, guard and UI.
+### Constraints from the WebUI extension contract (`docs/EXTENSIONS.md`)
 
-**A fork is justified only if** a required change cannot be expressed as a theme, a tab, an
-override, a slot or a plugin route, for example removing a built-in page *and* its API. Keep
-a list of such gaps in `docs/GAPS.md` during the workshop. Each gap is first a candidate for
-a small upstream PR to the generic plugin surface, and only then a reason to fork.
+| Constraint | Consequence for us |
+|---|---|
+| Extensions run with **full WebUI session authority** and are not a sandbox | Only our own reviewed extension is enabled; one customer per container keeps that authority inside one persona |
+| Extensions **cannot register backend routes** | Workbench data comes from a small **read-only loopback sidecar** in each container, reached through WebUI's consented sidecar proxy path with `proxy_auth: token-v1` |
+| A signed-in user can one-click install gallery extensions; no operator switch was found | First `core:` candidate: an operator flag that disables install (GAP-1, phase 0 confirms) |
+| Skins change only the `--accent` family | Deeper per-persona styling lives in the extension stylesheet, scoped by a `data-persona` attribute |
+| Extension settings are browser-local, not secrets | No tokens or persona data in extension settings or storage |
 
 ---
 
@@ -78,10 +92,10 @@ Consequences for this design:
 
 | Tempting shortcut | Why it fails | What we do instead |
 |---|---|---|
-| One Hermes process, ten profiles, one customer per profile | Profiles share a process. The machine dashboard can switch to *every* profile, including Config and API Keys. | **One container per persona**, each with one profile. |
-| Give each customer the Foundry key | The dashboard has Keys/Config pages and `PUT /api/env`, so a customer could read or misuse it | The container holds only a **per-customer gateway token** (§6). |
+| One Hermes process, ten profiles, one customer per profile | Profiles share a process, and both WebUI and the dashboard can switch profiles. | **One container per persona**, each with one profile. |
+| Give each customer the Foundry key | WebUI settings and the dashboard both expose provider setup, so a customer could read or misuse it | The container holds only a **per-customer gateway token** (§6). |
 | Trust the PersonaDesk `pre_tool_call` guard as the wall | In-process heuristic | Keep the guard for *policy*; rely on the container for *containment*. |
-| Expose the dashboard on `0.0.0.0` without auth | Hermes refuses: a non-loopback bind always requires an auth provider | Bind each container's dashboard to its private network; put the portal (§7) in front. |
+| Expose WebUI on `0.0.0.0` without auth | WebUI auth is off by default (`api/auth.py`) | Enable WebUI auth, bind to the private network, put the portal (§7) in front. |
 
 ---
 
@@ -90,28 +104,38 @@ Consequences for this design:
 ```mermaid
 flowchart LR
     U[Persona user, browser] --> P[Portal: login and routing]
-    P -->|session for daniel| D1[Container: Hermes for Daniel]
-    P -->|session for priya| D2[Container: Hermes for Priya]
-    P -->|...| Dn[One container per persona]
-    subgraph D1c[Daniel's container]
-        D1 --> DB1[Dashboard --isolated + Daniel theme + Workbench plugin]
-        D1 --> A1[Agent turns: PersonaDesk tools and guard]
+    P -->|session for daniel| C1[Container: Daniel]
+    P -->|session for priya| C2[Container: Priya]
+    P -->|...| Cn[One container per persona]
+    subgraph C1c[Daniel's container]
+        W1[Hermes WebUI fork + PersonaDesk extension + Daniel skin] --> A1[Hermes agent in-process: PersonaDesk tools and guard]
+        W1 -->|consented sidecar proxy| S1[Workbench sidecar, read-only, loopback]
         A1 --> F1[Daniel's fixtures and records only]
+        S1 --> F1
     end
     A1 -->|per-customer token| G[Model gateway: auth, budget, metering]
     G --> FM[Foundry hosted models]
     G --> LM[Local models: writer LoRA, router SLM]
     G --> M[(Usage ledger)]
     M --> R[Cost report per persona]
+    O[Operator] --> OD[Official Hermes dashboard, operator network only]
 ```
 
 | Component | Owns | Must not own |
 |---|---|---|
 | **Portal** | Login, mapping user → persona container, reverse proxy | Agent logic, model keys, persona data |
-| **Persona container** (Hermes) | One profile: `SOUL.md`, skills, memory, sessions, PersonaDesk plugin, dashboard theme + Workbench | Other personas' data, provider keys |
-| **PersonaDesk plugin** (existing, extended) | Tools, guard, review records; new `dashboard/` subfolder | A second chat UI, a second session store |
+| **Persona container** | WebUI (fork), one `HERMES_HOME` with one profile: `SOUL.md`, skills, memory, sessions, PersonaDesk plugin | Other personas' data, provider keys |
+| **PersonaDesk extension** (fork, `extensions/personadesk/`) | Layout, panels, persona styling | Secrets, a second chat, any write path around the guard |
+| **Workbench sidecar** (this workshop, `sidecar/`) | Read-only JSON for panels, from this persona's PersonaDesk records | Writes, other personas' data |
+| **PersonaDesk plugin** (existing) | Tools, guard, review records | UI |
 | **Model gateway** (new, small) | Provider keys, per-customer tokens, budgets, the usage ledger | Persona data, tool execution |
 | **Local model server** (existing from Workshops 1–3) | Writer adapters, router student | Authorization |
+
+WebUI runs the Hermes agent **in-process** (`api/streaming.py` builds `AIAgent`), so tools run
+in the WebUI container. Phase 0 confirms that the PersonaDesk Hermes plugin and its
+`pre_tool_call` guard load on that path; if not, the container uses WebUI's gateway mode
+(`HERMES_API_URL`) with a Hermes gateway beside it, as in the fork's
+`docker-compose.two-container.yml`.
 
 Every row keeps Workshop 2's rule: **one owner for each responsibility**, and Hermes remains
 the only agent runtime.
@@ -124,17 +148,17 @@ Personalisation has five layers. Only the first two change pixels.
 
 | Layer | Hermes construct | Per-persona example |
 |---|---|---|
-| Look | Dashboard **theme** YAML | Daniel: dense, neutral finance palette. Priya: high-contrast support palette. |
-| Layout and panels | Dashboard **UI plugin** (Workbench tab, `tab.override: "/"` home, `chat:top` slot) | Daniel's home shows an invoice-exception table; Noah's shows an itinerary timeline. |
+| Look | WebUI **skin** + extension stylesheet scoped by `data-persona` | Daniel: dense, neutral finance palette. Priya: high-contrast support palette. |
+| Layout and panels | WebUI **extension** (Workbench drawer beside the chat) | Daniel's Workbench shows an invoice-exception table; Noah's shows an itinerary timeline. |
 | Voice | Profile **`SOUL.md`** (already exists for three personas) | Same as Workshop 2. |
 | Know-how | **Skills** in the profile | Priya's "ask for environment details before escalating" procedure. |
 | Authority | PersonaDesk **permissions** (`config/persona_permissions.json`) + guard | Unchanged. The UI can never widen what a persona may do. |
 
-**One plugin, ten layouts.** Write a single `personadesk` dashboard extension whose layout is
+**One extension, ten layouts.** Write a single `personadesk` WebUI extension whose layout is
 driven by a per-persona JSON file (`ux/<persona-id>.json`), instead of ten separate plugins.
 The layout lists panels from a small, fixed catalogue:
 
-| Panel | Data source (read-only plugin route) | Used by |
+| Panel | Data source (read-only sidecar route) | Used by |
 |---|---|---|
 | Work queue | PersonaDesk task records | All |
 | Draft review | PersonaDesk review records | All |
@@ -147,15 +171,18 @@ The layout lists panels from a small, fixed catalogue:
 
 Rules for the Workbench:
 
-- It is **structured UI around the chat, not a second chat**. Chat stays the embedded terminal
-  (`/chat`), as the dashboard's `AGENTS.md` requires.
-- Plugin routes are **read-only** in the first release. Approvals still go through the
+- It is **structured UI around the chat, not a second chat**. Chat stays WebUI's own chat.
+- Sidecar routes are **read-only** in the first release. Approvals still go through the
   PersonaDesk review commands, so the UI adds no new write path that skips the guard.
-- Handlers are `async` or use `asyncio.to_thread`, so they never block the dashboard.
+- The extension never stores tokens or persona data in browser storage.
 
-### Persona UX cards (to be completed in phase 1)
+### Persona UX cards (completed in phase 1)
 
-| Persona | Home panels | Theme intent |
+The cards below are encoded in [`ux/<persona-id>.json`](ux/). Phase 1 also added the three
+"All" panels from the catalogue (work queue, draft review, spend) to every layout, after the
+card's own panels, so each Workbench has something usable before phase 6.
+
+| Persona | Workbench panels | Style intent |
 |---|---|---|
 | Maya Chen (CEO) | Decision brief, work queue | Calm, minimal |
 | Daniel Okafor (CFO) — MVP | Evidence table, suggested checks, draft review | Dense, tabular |
@@ -187,7 +214,7 @@ OpenAI-compatible gateway sits between every container and every model.
 | Never | Store prompts or completions in the ledger by default |
 
 Each container's Hermes `config.yaml` points its model provider at the gateway with that
-persona's token as the API key. A customer who opens the Keys page sees only their own
+persona's token as the API key. A customer who opens provider settings sees only their own
 revocable token.
 
 Cost reporting reuses Workshop 2's cost model and Workshop 3's comparison. The ledger shows
@@ -202,19 +229,17 @@ unreviewed third-party proxy.
 
 ## 7. The portal: one login, one container
 
-- Authenticate the user with a self-hosted OIDC provider (for example Keycloak in a
-  container) or, for a local-only workshop, Hermes' username/password provider on each
-  dashboard behind the portal.
+- Authenticate the user at the portal: a self-hosted OIDC provider (for example Keycloak in a
+  container) or, for a local-only workshop, a simple username/password table.
 - Map the authenticated user to exactly one persona container.
-- Reverse-proxy HTTP **and** the `/api/pty` WebSocket to that container. The chat depends on it.
+- Reverse-proxy HTTP **and** Server-Sent Events to that container (WebUI chat streams over
+  SSE; disable proxy buffering for `text/event-stream`).
 - Never let a request choose its container by URL or header: the mapping comes only from the
   authenticated identity.
-- Run each dashboard with `--isolated`, so its profile switcher cannot reach other profiles.
-  In our layout each container has only one profile anyway.
-
-Open question to verify in phase 0: whether to terminate auth at the portal and run the
-dashboards on a private network, or to keep Hermes' own auth gate on every dashboard as well
-(defence in depth). The plan assumes **both**.
+- Defence in depth: each WebUI also sets `HERMES_WEBUI_PASSWORD` (or passkeys), binds only to
+  the private container network, and lists only the portal origin in
+  `HERMES_WEBUI_ALLOWED_ORIGINS`.
+- The official dashboard is reachable only from the operator network, never through the portal.
 
 ---
 
@@ -236,14 +261,23 @@ Each phase ends with a gate. Do not start the next phase until its gate passes.
 
 | Phase | Goal | Deliverables | Gate |
 |---|---|---|---|
-| **0. Ground truth** | Pin versions and verify assumptions | Hermes stable release chosen; `docs/VERIFY.md` confirming the theme, UI plugin, `plugin_api.py`, `tab.override`, page-scoped slots, `--isolated` and auth providers on that release | Every item in VERIFY.md checked on the pinned release, inside WSL2 or Docker (the chat terminal does not run on native Windows) |
-| **1. UX design** | Turn the ten cards in §5 into specs | `ux/<persona-id>.json` ×10, a wireframe per MVP persona, panel catalogue schema | Each layout uses only catalogue panels; reviewed by a person |
-| **2. One persona, one container** | Priya end-to-end locally | Container image; Priya theme; `personadesk` dashboard extension (Workbench, home override, `chat:top` banner); read-only routes | Priya completes her anchor scenario from the Workbench + chat; guard still blocks a forbidden tool |
+| **0. Ground truth** | Pin versions and verify assumptions | `docs/VERIFY.md`: fork commit and upstream base; extension loading via `HERMES_WEBUI_EXTENSION_DIR` + manifest; skins; sidecar proxy with `token-v1`; whether the PersonaDesk plugin and guard load in WebUI's in-process agent; how to disable gallery install | Every item checked with isolated `HERMES_HOME` and `HERMES_WEBUI_STATE_DIR` (fork `AGENTS.md` rule) |
+| **1. UX design** | Turn the ten cards in §5 into specs | `ux/catalog.json`, `ux/<persona-id>.json` ×10, validation tests | Each layout uses only catalogue panels; tests pass; reviewed by a person |
+| **2. One persona, one container** | Priya end-to-end locally | Fork branch `personadesk-portal` with `extensions/personadesk/`; Workbench sidecar; container image | Priya completes her anchor scenario in WebUI with the Workbench; guard still blocks a forbidden tool |
 | **3. Model gateway** | Managed models, no keys in containers | Gateway service, token per persona, budget, ledger, tests | Container works with only a gateway token; a budget breach is refused; the ledger matches the request count |
-| **4. Portal + three MVP personas** | Priya, Daniel, Noah behind one login | Portal, Compose file, OIDC or basic auth, routing table | Isolation tests in §10 all pass |
-| **5. Evidence** | Measure, do not estimate | `docs/evidence/PORTAL_MVP.md`: task completion per anchor scenario, guard blocks, cost per persona (hosted vs local columns), dashboard latency | Every number in the report traces to a ledger row or test run |
+| **4. Portal + three MVP personas** | Priya, Daniel, Noah behind one login | Portal, Compose file, routing table | Isolation tests in §10 all pass |
+| **5. Evidence** | Measure, do not estimate | `docs/evidence/PORTAL_MVP.md`: task completion per anchor scenario, guard blocks, cost per persona (hosted vs local columns), UI latency | Every number traces to a ledger row, a test run, or a Workshop 6 eval result |
 | **6. Remaining seven personas** | Profiles, policies, fixtures, layouts | Seven new profiles and containers | Same gates as phases 2 and 4 |
 | **7. Workshop 3 tie-in** | Advisory router panel, real cost comparison | `pd_suggest_checks` tool + panel; cost table | Panel is labelled advisory; table separates Foundry and local |
+
+Workshop 6 (Vally evals, [`../agent-evals-vally/PLAN.md`](../agent-evals-vally/PLAN.md))
+provides the per-persona release gate used in phases 2, 4 and 6.
+
+**Progress.** Phase 1 is built: layouts, catalogue and validation tests. Its "reviewed by a
+person" gate is still open. Phase 2 is partly built: the fork branch, extension, sidecar and
+an end-to-end smoke test exist. Still open: Priya's anchor scenario with a real Hermes turn
+in WebUI, the guard check inside WebUI, and the container image. Phase 0 items checked so
+far are in [`docs/VERIFY.md`](docs/VERIFY.md).
 
 ---
 
@@ -251,18 +285,18 @@ Each phase ends with a gate. Do not start the next phase until its gate passes.
 
 Security and isolation tests (automated, run against the Compose stack):
 
-1. A user signed in as Priya cannot reach Daniel's container by any URL, header or WebSocket path.
+1. A user signed in as Priya cannot reach Daniel's container by any URL, header or SSE path.
 2. No container's environment, config or files contain a provider key (scan the image and the running container).
 3. A revoked gateway token stops that persona's agent from calling any model.
 4. A persona over budget is refused, and the refusal is shown in the UI.
 5. The PersonaDesk guard still blocks each persona's `blocked_actions`. The new UI does not change this.
-6. Plugin routes are read-only: every non-GET route on `/api/plugins/personadesk/` is absent.
-7. A dashboard bound to a non-loopback address without an auth provider refuses to start, as Hermes documents.
+6. The sidecar is read-only (only `GET` routes exist), binds to loopback, and rejects requests without the `token-v1` secret.
+7. Extension install from the gallery is unavailable to customers (after GAP-1).
 
 Behaviour tests (unit, in this workshop's `tests/`):
 
-- Layout JSON validates against the panel catalogue schema.
-- Each panel route returns only the calling persona's records.
+- Layout JSON validates against the panel catalogue.
+- Each sidecar route returns only the configured persona's records.
 - The gateway ledger row count equals the number of model calls; token sums match provider responses.
 
 Evidence rules from earlier workshops apply: no invented numbers, every figure links to a
@@ -270,28 +304,38 @@ run, and an agent never grades itself.
 
 ---
 
-## 11. Repository layout (planned)
+## 11. Repository layout (✅ built, ⏳ planned)
+
+In this repository:
 
 ```
 workshops/persona-portal/
-├── PLAN.md                     # this file
-├── README.md                   # learner quick start (phase 2)
+├── PLAN.md                     # ✅ this file
+├── README.md                   # ✅ learner quick start
 ├── docs/
-│   ├── VERIFY.md               # phase 0 checklist on the pinned Hermes release
-│   ├── GAPS.md                 # things the dashboard extension surface could not do
-│   └── evidence/PORTAL_MVP.md  # phase 5 measured results
-├── ux/<persona-id>.json        # one layout per persona
-├── themes/<persona-id>.yaml    # dashboard themes, copied into each container's HERMES_HOME
-├── gateway/                    # model gateway service + tests
-├── portal/                     # login + routing + tests
-├── containers/                 # image build and per-persona HERMES_HOME seeding
-├── compose.yaml                # local stack
-└── tests/                      # isolation and behaviour tests
+│   ├── VERIFY.md               # ✅ phase 0 checklist (partly checked)
+│   ├── GAPS.md                 # ✅ what extensions could not do; each core: commit on the fork
+│   └── evidence/PORTAL_MVP.md  # ⏳ phase 5 measured results
+├── ux/catalog.json             # ✅ panel catalogue
+├── ux/<persona-id>.json        # ✅ one layout per persona (10)
+├── sidecar/                    # ✅ read-only Workbench data service
+├── scripts/smoke_e2e.py        # ✅ WebUI + extension + sidecar end-to-end check
+├── gateway/                    # ⏳ model gateway service
+├── portal/                     # ⏳ login + routing
+├── containers/                 # ⏳ image build and per-persona HERMES_HOME seeding
+├── compose.yaml                # ⏳ local stack
+└── tests/                      # ✅ layout and sidecar tests (isolation tests ⏳)
 ```
 
-The dashboard extension itself goes in the existing PersonaDesk plugin, as
-`workshops/personal-agent-multilora/hermes_plugin/dashboard/`, so one plugin install brings
-tools, guard and UI together.
+On the fork (`external/hermes-webui`, branch `personadesk-portal`, ✅ built; the submodule is pinned to it):
+
+```
+extensions/personadesk/
+├── manifest.json               # assets + loopback sidecar declaration (proxy_auth: token-v1)
+├── personadesk.js              # Workbench drawer and panels
+├── personadesk.css             # per-persona styling scoped by data-persona
+└── README.md                   # how to load it with HERMES_WEBUI_EXTENSION_DIR
+```
 
 ---
 
@@ -299,10 +343,8 @@ tools, guard and UI together.
 
 | Tier | Where | Notes |
 |---|---|---|
-| Light | This class of machine (RTX 3080 10 GB) with WSL2 or Docker Desktop | Three MVP containers + gateway + portal; Foundry for the controller; local writer/router on the GPU |
+| Light | This class of machine (RTX 3080 10 GB), natively or with Docker Desktop | WebUI runs on Windows, so phases 0–2 need no containers; three MVP containers + gateway + portal from phase 4; local writer/router on the GPU |
 | Full | DGX Spark | All ten containers, local models on the Spark, same Compose file |
-
-The chat terminal uses a POSIX pseudo-terminal, so containers run Linux on every tier.
 
 ---
 
@@ -310,10 +352,12 @@ The chat terminal uses a POSIX pseudo-terminal, so containers run Linux on every
 
 | Risk or question | Mitigation or next step |
 |---|---|
-| The dashboard is an operator console (Config, Keys, MCP, Skills pages) | Isolated container + gateway token limit the damage. Phase 0 lists which pages a customer can change; overriding them is phase 2 work, and anything left goes in GAPS.md |
-| Submodule tracks Hermes `main`; this machine runs stable v0.22.5 | Phase 0 pins one stable release for the images; the submodule is for reading the source |
+| Extensions have full session authority | Only our reviewed extension; one persona per container; GAP-1 removes customer install |
+| The fork drifts from upstream | Extension-first rule; `core:` commits small and upstream-ready; merge upstream every phase |
+| WebUI's in-process agent may not load the PersonaDesk plugin/guard | Phase 0 verifies; fallback is gateway mode with a Hermes gateway beside WebUI |
+| WebUI Settings expose provider/model setup | Gateway token limits damage; phase 0 lists which settings a customer can change; hiding them is a GAPS.md item |
+| Submodules track moving branches | Phase 0 pins commits for images; the submodules are for reading and developing |
 | Ten containers × memory on the light tier | Measure in phase 4; start three at a time |
-| Customers expect a branded chat, not a terminal-styled one | Chat is the embedded TUI by design; theme it. A different chat surface is a GAPS.md item, not a fork |
 | Router student is not parity-verified | Advisory only, labelled as such |
 
 ---
@@ -321,9 +365,10 @@ The chat terminal uses a POSIX pseudo-terminal, so containers run Linux on every
 ## 14. Definition of done
 
 - Ten personas each sign in through one portal and land in their own container with their own
-  theme and Workbench layout.
+  skin and Workbench layout in Hermes WebUI.
 - No container holds a provider key; all model traffic goes through the metered gateway.
 - The isolation and guard tests in §10 pass.
 - `docs/evidence/PORTAL_MVP.md` reports measured task completion and cost per persona, with
   hosted and local usage in separate columns.
-- No Hermes core file is modified. Any dashboard limitation is recorded in `docs/GAPS.md`.
+- No Hermes agent core file is modified. Every WebUI core change is a labelled `core:` commit
+  on the fork, listed in `docs/GAPS.md`.

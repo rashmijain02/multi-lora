@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "job": {
+    "job_id": "job-1c27a44f13fb",
+    "source_key": "vally:priya-raman-support:priya-002:draft_reply:259dfd43",
+    "principal": "vally-eval",
+    "client_id": "priya-raman-support",
+    "profile": "pd-priya",
+    "fixture_id": "priya-002",
+    "task": "draft_reply",
+    "release_id": null,
+    "status": "awaiting_review",
+    "hermes_session_id": "fake-session-483700",
+    "error": null,
+    "attempts": 1,
+    "created_at": "2026-10-29T20:13:56+00:00",
+    "updated_at": "2026-10-29T20:13:57+00:00"
+  },
+  "draft": {
+    "draft_id": "job-1c27a44f13fb-r1",
+    "job_id": "job-1c27a44f13fb",
+    "revision": 1,
+    "client_id": "priya-raman-support",
+    "body": "Hello,\n\nThank you for your message about \"Refund for duplicate annual charge\".\n\n- The $240.00 charge is within the 30-day refund window; refund recommended to the billing team, who process all refunds and review within two business days.\n\nBest regards,\nPersonaDesk draft",
+    "evidence": [
+      {
+        "kind": "fixture",
+        "owner": "priya-raman-support",
+        "source_id": "fixture:priya-002",
+        "fixture_id": "priya-002",
+        "fixture_version": 1,
+        "content_hash": "sha256:e7fbca4d7f6a6d5faf2ab804aef8ca04feacd7b4d78ffd524f1c85816800b6f2",
+        "as_of": "2026-10-20T10:00:00Z"
+      },
+      {
+        "kind": "policy",
+        "owner": "priya-raman-support",
+        "source_id": "policy:support-escalation",
+        "policy_version": 1,
+        "content_hash": "sha256:502df4def76268002ccead0e43533f6214fbee12fcc01c26c6a36819e360b0f0"
+      },
+      {
+        "kind": "policy",
+        "owner": "priya-raman-support",
+        "source_id": "policy:support-refunds",
+        "policy_version": 1,
+        "content_hash": "sha256:9a18a99ab50f3f5e2e6823b8eef44038e2cd89bf783c6ea8395338da05c97874"
+      }
+    ],
+    "uncertainties": [],
+    "blocked_actions": [
+      "send_email",
+      "issue_refund",
+      "promise_fix_date",
+      "change_account"
+    ],
+    "writer": {
+      "backend": "template",
+      "adapter": null,
+      "adapted": false
+    },
+    "artifact_hash": "sha256:0406cece461178ee7125d298442e8005cb6197afe95426199da54d1c2e8d5bc0",
+    "created_at": "2026-10-29T20:13:57+00:00"
+  }
+}

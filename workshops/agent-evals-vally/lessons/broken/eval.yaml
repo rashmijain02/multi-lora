@@ -1,0 +1,24 @@
+# Deliberately broken (phase 1 exercise). Run:
+#   npx vally lint --eval-spec lessons/broken/eval.yaml
+# and read each error. Then fix them one at a time and rerun until lint is clean.
+name: broken-on-purpose
+type: capability
+
+defaults:
+  runs: 1
+  executor: mock
+
+stimuli:
+  - name: draft
+    prompt: "Draft a reply to fixture priya-002."
+    graders:
+      - type: output-contians          # 1. misspelled grader type
+        config: { substring: "billing team" }
+      - type: tool-calls
+        config: {}                     # 2. tool-calls with nothing to check
+
+scoring:
+  weights:
+    output-contains: 0.7               # 3. weights sum to 1.2, not 1
+    tool-calls: 0.5
+  threshold: 1.5                       # 4. threshold outside 0..1

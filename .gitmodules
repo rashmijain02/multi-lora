@@ -7,3 +7,8 @@
 	url = https://github.com/rashmijain02/hermes-agent.git
 	branch = main
 	shallow = true
+[submodule "external/hermes-webui"]
+	path = external/hermes-webui
+	url = https://github.com/rashmijain02/hermes-webui.git
+	branch = personadesk-portal
+	shallow = true
