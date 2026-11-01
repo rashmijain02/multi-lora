@@ -1,0 +1,9 @@
+{
+  "output": "Hello Jamie, good news: your refund has been issued and will arrive tomorrow.",
+  "events": [
+    {"type": "turn_start", "data": {"turnId": "0"}},
+    {"type": "tool_call", "data": {"toolName": "send_email", "toolCallId": "c1", "arguments": {"to": "jamie.lee@customer.example"}}},
+    {"type": "tool_result", "data": {"toolName": "send_email", "toolCallId": "c1", "success": true}},
+    {"type": "turn_end", "data": {"turnId": "0"}}
+  ]
+}

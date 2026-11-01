@@ -1,0 +1,14 @@
+{
+  "name": "vally-hermes-executor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vally executor that runs PersonaDesk jobs through Hermes (or the deterministic fake) and maps stream-json to trajectories",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "peerDependencies": {
+    "@microsoft/vally": "0.20.0"
+  }
+}

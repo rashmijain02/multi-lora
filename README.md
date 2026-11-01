@@ -14,7 +14,9 @@ Work through the stages in order. Each stage produces something the next one use
 | 4. Workshop 2 | Run PersonaDesk persona agents on Hermes | Persona adapters from stage 3 as its writer (optional at first) | CPU with a hosted model; GPU for the full local stack |
 | 5. Workshop 3 (optional) | Train a small model to take over one hosted agent role (the router), behind a parity gate | PersonaDesk checks, fixtures and cost model from stage 4; the 0.5B LoRA recipe from stage 2 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
 | 6. Workshop 4 (optional) | Let a Hermes agent run guarded training experiments (AutoResearch) | Hermes concepts and the "agent never grades itself" rule from stage 4 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
-| 7. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–6 | — |
+| 7. Workshop 5 (optional) | Give each persona a personalised, read-only Workbench in Hermes WebUI (extension on our fork) | PersonaDesk personas, jobs and drafts from stage 4 | CPU is enough for what is built so far |
+| 8. Workshop 6 (optional) | Evaluate Hermes agents with Vally: pass/fail release gates per persona and for safety | PersonaDesk driver, fixtures and guard from stage 4 | CPU with fake Hermes; a hosted model for real runs |
+| 9. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–8 | — |
 
 ### Stage 1: Concepts (study kit)
 
@@ -103,7 +105,25 @@ budget. A held-out test checks the final result. There are two tiers:
 
 Start with the [plan](workshops/autoresearch-spark/PLAN.md).
 
-### Stage 7: Decide
+### Stage 7: Workshop 5, PersonaDesk Portal
+
+[`workshops/persona-portal`](workshops/persona-portal/README.md) gives each persona a
+**Workbench** beside Hermes WebUI's own chat: work queue, drafts awaiting review, and their
+evidence, laid out per persona from `ux/<persona-id>.json`. It is a WebUI extension on our fork
+([`external/hermes-webui`](external/hermes-webui), branch `personadesk-portal`). The extension is
+backed by a read-only, single-persona sidecar behind WebUI's token-checked proxy. Built so far:
+layouts, sidecar, extension, and an end-to-end smoke test. The model gateway and the portal are
+planned. Start with the [plan](workshops/persona-portal/PLAN.md).
+
+### Stage 8: Workshop 6, evaluating agents with Vally
+
+[`workshops/agent-evals-vally`](workshops/agent-evals-vally/README.md) writes Microsoft Vally
+eval specs for PersonaDesk. A custom executor drives a Hermes job; hidden answer keys and a
+program grader check the stored draft; and a safety suite acts as a release blocker, with a
+negative control that must fail. Everything runs with fake Hermes on a CPU. Start with the
+[plan](workshops/agent-evals-vally/PLAN.md).
+
+### Stage 9: Decide
 
 Use the study-kit templates and the evidence from the workshops to make the decisions listed
 under [Intended result](#intended-result). For managed hosting, see the email workshop's

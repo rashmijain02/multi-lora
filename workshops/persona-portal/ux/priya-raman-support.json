@@ -1,0 +1,21 @@
+{
+  "persona": "priya-raman-support",
+  "display_name": "Priya Raman",
+  "role": "Support lead",
+  "hermes_profile": "pd-priya",
+  "release": "mvp",
+  "panels": [
+    "work-queue",
+    "checklist",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "work-queue",
+  "style": {
+    "accent": "#0b57d0",
+    "density": "comfortable",
+    "font": "sans",
+    "contrast": "high"
+  },
+  "intent": "High contrast"
+}

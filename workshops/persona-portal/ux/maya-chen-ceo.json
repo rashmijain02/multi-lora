@@ -1,0 +1,21 @@
+{
+  "persona": "maya-chen-ceo",
+  "display_name": "Maya Chen",
+  "role": "CEO",
+  "hermes_profile": "pd-maya",
+  "release": "planned",
+  "panels": [
+    "decision-brief",
+    "work-queue",
+    "draft-review",
+    "spend"
+  ],
+  "default_panel": "decision-brief",
+  "style": {
+    "accent": "#3b4a6b",
+    "density": "comfortable",
+    "font": "sans",
+    "contrast": "normal"
+  },
+  "intent": "Calm, minimal"
+}

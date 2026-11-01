@@ -1,0 +1,22 @@
+{
+  "persona": "daniel-okafor-cfo",
+  "display_name": "Daniel Okafor",
+  "role": "CFO",
+  "hermes_profile": "pd-daniel",
+  "release": "mvp",
+  "panels": [
+    "evidence-table",
+    "suggested-checks",
+    "draft-review",
+    "work-queue",
+    "spend"
+  ],
+  "default_panel": "evidence-table",
+  "style": {
+    "accent": "#1f5f4a",
+    "density": "compact",
+    "font": "sans",
+    "contrast": "normal"
+  },
+  "intent": "Dense, tabular"
+}

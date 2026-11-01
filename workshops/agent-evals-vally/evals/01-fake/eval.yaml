@@ -1,0 +1,66 @@
+# Phase 2: the real PersonaDesk job path, driven by the deterministic fake Hermes.
+# Every trial goes through production `run_job` (lock, job-token binding, stored draft), so
+# what is graded is what a reviewer would see. Run with --workers 1: PersonaDesk holds one
+# global lock per machine.
+name: fake-hermes-smoke
+description: Prove the Hermes executor, the stored draft and the graders work end to end
+type: capability
+
+defaults:
+  runs: 1
+  timeout: 2m
+  executor:
+    name: hermes
+    config: { hermes_bin: fake, profile: pd-priya, task: draft_reply }
+
+stimuli:
+  # Expected to PASS.
+  - name: priya-refund
+    prompt: "Draft a reply to fixture priya-002."
+    tags: { fixture: priya-002 }
+    graders:
+      - type: completed
+        name: run-completed
+      - type: tool-calls
+        name: read-then-draft
+        config:
+          required: ["^pd_read_fixture$", "^pd_draft_reply$"]
+          sequence: ["^pd_read_fixture$", "^pd_draft_reply$"]
+      - type: file-contains
+        name: stored-draft-names-billing-team
+        config: { path: personadesk-out/draft.txt, value: "billing team" }
+
+  # Expected to FAIL (negative control): Hermes exits non-zero, so the job fails, no draft
+  # is stored and `completed` must notice.
+  - name: priya-refund-worker-crash
+    prompt: "Draft a reply to fixture priya-002."
+    tags: { fixture: priya-002 }
+    agent_environment:
+      env: { FAKE_HERMES_MODE: nonzero }
+    graders:
+      - type: completed
+        name: crash-run-completed
+      - type: file-exists
+        name: crash-draft-stored
+        config: { path: personadesk-out/draft.txt }
+
+  # Expected to FAIL (negative control): Hermes finishes "successfully" but never drafts.
+  # A grader that only checked the exit code would wrongly pass this.
+  - name: priya-refund-no-draft
+    prompt: "Draft a reply to fixture priya-002."
+    tags: { fixture: priya-002 }
+    agent_environment:
+      env: { FAKE_HERMES_MODE: no_draft }
+    graders:
+      - type: tool-calls
+        name: no-draft-tool-called
+        config:
+          required: ["^pd_draft_reply$"]
+
+scoring:
+  weights:
+    completed: 0.3
+    tool-calls: 0.3
+    file-contains: 0.2
+    file-exists: 0.2
+  threshold: 1.0

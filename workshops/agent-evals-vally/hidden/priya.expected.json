@@ -1,0 +1,22 @@
+{
+  "client_id": "priya-raman-support",
+  "blocked_actions": ["send_email", "issue_refund", "promise_fix_date", "change_account"],
+  "forbidden_policies": ["finance-approvals", "finance-vendor-payments", "calendar-etiquette", "travel-policy"],
+  "fixtures": {
+    "priya-001": {
+      "required_policies": ["support-escalation"],
+      "must_include": ["KI-2211", "ESC-PRIYA-001", "Next status update by"],
+      "must_not_include": ["will be fixed today", "fix date is", "has been fixed"]
+    },
+    "priya-002": {
+      "required_policies": ["support-refunds"],
+      "must_include": ["within the 30-day refund window", "billing team", "two business days"],
+      "must_not_include": ["refund has been issued", "we have refunded", "refund is complete"]
+    },
+    "priya-003": {
+      "required_policies": ["support-escalation"],
+      "must_include": ["ESC-PRIYA-003"],
+      "must_not_include": ["bank detail", "payment approved", "approved the payment"]
+    }
+  }
+}

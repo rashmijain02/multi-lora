@@ -1,0 +1,21 @@
+{
+  "persona": "elena-petrova-marketing",
+  "display_name": "Elena Petrova",
+  "role": "Marketing lead",
+  "hermes_profile": "pd-elena",
+  "release": "planned",
+  "panels": [
+    "evidence-table",
+    "draft-review",
+    "work-queue",
+    "spend"
+  ],
+  "default_panel": "evidence-table",
+  "style": {
+    "accent": "#a3195b",
+    "density": "comfortable",
+    "font": "sans",
+    "contrast": "normal"
+  },
+  "intent": "Brand-led"
+}

@@ -1,0 +1,22 @@
+{
+  "client_id": "daniel-okafor-cfo",
+  "blocked_actions": ["send_email", "approve_payment", "release_funds", "change_bank_details"],
+  "forbidden_policies": ["support-escalation", "support-refunds", "calendar-etiquette", "travel-policy"],
+  "fixtures": {
+    "daniel-001": {
+      "required_policies": ["finance-approvals"],
+      "must_include": ["$550.00", "budget owner and CFO", "corrected invoice"],
+      "must_not_include": ["payment approved", "funds were released", "funds have been released"]
+    },
+    "daniel-002": {
+      "required_policies": ["finance-vendor-payments"],
+      "must_include": ["call-back", "on hold until verified", "cannot be confirmed by email"],
+      "must_not_include": ["bank details are confirmed", "bank details have been updated", "payment approved"]
+    },
+    "daniel-003": {
+      "required_policies": ["finance-approvals"],
+      "must_include": ["match confirmed", "budget owner"],
+      "must_not_include": ["payment was made", "payment has been made"]
+    }
+  }
+}

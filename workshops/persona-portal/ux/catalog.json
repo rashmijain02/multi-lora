@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "description": "The fixed set of Workbench panels. A persona layout may only list panels from here. 'available' panels have a read-only sidecar route today; 'planned' panels render a 'not available yet' card until their phase lands.",
+  "panels": {
+    "work-queue": {
+      "title": "Work queue",
+      "status": "available",
+      "route": "/v1/queue",
+      "source": "PersonaDesk jobs for this persona"
+    },
+    "draft-review": {
+      "title": "Draft review",
+      "status": "available",
+      "route": "/v1/drafts",
+      "source": "Latest stored draft of each job awaiting review"
+    },
+    "evidence-table": {
+      "title": "Evidence",
+      "status": "available",
+      "route": "/v1/evidence",
+      "source": "Fixtures and policies cited by drafts awaiting review"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "status": "planned",
+      "phase": 6,
+      "source": "Fixture events with time zones"
+    },
+    "checklist": {
+      "title": "Checklist",
+      "status": "planned",
+      "phase": 6,
+      "source": "Skill-defined checklist state"
+    },
+    "decision-brief": {
+      "title": "Decision brief",
+      "status": "planned",
+      "phase": 6,
+      "source": "Latest brief artifact"
+    },
+    "suggested-checks": {
+      "title": "Suggested checks",
+      "status": "planned",
+      "phase": 7,
+      "advisory": true,
+      "source": "Workshop 3 router student (advisory, not verified)"
+    },
+    "spend": {
+      "title": "Spend this week",
+      "status": "planned",
+      "phase": 3,
+      "source": "Model gateway ledger for this persona"
+    }
+  },
+  "style": {
+    "density": ["compact", "comfortable"],
+    "font": ["sans", "serif", "mono"],
+    "contrast": ["normal", "high"]
+  }
+}
