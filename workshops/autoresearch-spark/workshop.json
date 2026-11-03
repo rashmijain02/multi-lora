@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "autoresearch-spark",
+  "order": 6,
+  "label": "Workshop 4",
+  "title": "AutoResearch",
+  "summary": "A Hermes agent runs its own training experiments: it edits train.py, trains on a fixed time budget, is graded by a harness it cannot change, and keeps or reverts the change. A light tier runs on a 10 GB GPU; the DGX Spark tier is plan only.",
+  "status": "partial",
+  "optional": true,
+  "hardware": "A 10 GB NVIDIA GPU (light tier) or a DGX Spark; the harness tests run on CPU",
+  "builds_on": ["personal-agent-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "PLAN.md", "title": "Plan"},
+    {"path": "program.md", "title": "Agent instructions (program.md)"},
+    {"path": "docs/evidence/LIGHT_TIER_BASELINE.md", "title": "Light tier baseline evidence"}
+  ],
+  "readiness": [
+    {"label": "Python environment", "path": "workshops/autoresearch-spark/.venv"},
+    {"label": "Upstream training code", "path": "workshops/autoresearch-spark/upstream"}
+  ],
+  "commands": [
+    {"kind": "check", "label": "Harness tests", "cwd": "workshops/autoresearch-spark", "run": "uv run --group dev pytest -q"},
+    {"kind": "check", "label": "Lint", "cwd": "workshops/autoresearch-spark", "run": "uv run --group dev ruff check ."}
+  ],
+  "prompts": [
+    {"label": "Agent never grades itself", "prompt": "In the AutoResearch workshop the agent edits train.py but cannot change the harness that grades it. Explain why that separation matters and what could go wrong without it."}
+  ],
+  "extensions": []
+}

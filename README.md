@@ -18,6 +18,9 @@ Work through the stages in order. Each stage produces something the next one use
 | 8. Workshop 6 (optional) | Evaluate Hermes agents with Vally: pass/fail release gates per persona and for safety | PersonaDesk driver, fixtures and guard from stage 4 | CPU with fake Hermes; a hosted model for real runs |
 | 9. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–8 | — |
 
+To browse every workshop in one place (summaries, docs, commands, and starter prompts), open the
+[UX workspace](ux-workspace/README.md): the **Workshop Hub** inside Hermes WebUI on our fork.
+
 ### Stage 1: Concepts (study kit)
 
 1. Read the [master plan](docs/multi-lora-learning-plan.md).
@@ -110,7 +113,8 @@ Start with the [plan](workshops/autoresearch-spark/PLAN.md).
 [`workshops/persona-portal`](workshops/persona-portal/README.md) gives each persona a
 **Workbench** beside Hermes WebUI's own chat: work queue, drafts awaiting review, and their
 evidence, laid out per persona from `ux/<persona-id>.json`. It is a WebUI extension on our fork
-([`external/hermes-webui`](external/hermes-webui), branch `personadesk-portal`). The extension is
+([`external/hermes-webui`](external/hermes-webui), branch `personadesk-portal`, now included in
+`multilora-ux`). The extension is
 backed by a read-only, single-persona sidecar behind WebUI's token-checked proxy. Built so far:
 layouts, sidecar, extension, and an end-to-end smoke test. The model gateway and the portal are
 planned. Start with the [plan](workshops/persona-portal/PLAN.md).

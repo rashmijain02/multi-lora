@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "slm-task-models",
+  "order": 5,
+  "label": "Workshop 3",
+  "title": "Small task models behind parity gates",
+  "summary": "Train a small model to take over one hosted agent role, the PersonaDesk router, and prove it with a hash-locked parity gate that every independent training run must pass. The judge and the controller are planned next.",
+  "status": "partial",
+  "optional": true,
+  "hardware": "A 10 GB NVIDIA GPU (light tier) or a DGX Spark; data, baseline and tests run on CPU",
+  "builds_on": ["personal-agent-multilora", "email-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "PLAN.md", "title": "Plan"},
+    {"path": "docs/evidence/ROUTER_PARITY.md", "title": "Router parity evidence"}
+  ],
+  "readiness": [
+    {"label": "Python environment", "path": "workshops/slm-task-models/.venv"},
+    {"label": "Router runs", "path": "workshops/slm-task-models/runs/router"}
+  ],
+  "commands": [
+    {"kind": "setup", "label": "Install (CPU)", "cwd": "workshops/slm-task-models", "run": "uv sync"},
+    {"kind": "setup", "label": "Install (training)", "cwd": "workshops/slm-task-models", "run": "uv sync --group train"},
+    {"kind": "check", "label": "Unit tests", "cwd": "workshops/slm-task-models", "run": "uv run pytest -q"},
+    {"kind": "check", "label": "Lint", "cwd": "workshops/slm-task-models", "run": "uv run ruff check ."},
+    {"kind": "try", "label": "Build the datasets", "cwd": "workshops/slm-task-models", "run": "uv run python -m slm_router data"},
+    {"kind": "try", "label": "Lexical baseline", "cwd": "workshops/slm-task-models", "run": "uv run python -m slm_router k0"}
+  ],
+  "prompts": [
+    {"label": "What is a parity gate?", "prompt": "Workshop 3 uses a hash-locked parity gate before a small model may replace a hosted model for the router role. Explain what the gate checks, why it is hash-locked, and why every independent training run must pass."}
+  ],
+  "extensions": []
+}

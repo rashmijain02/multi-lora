@@ -51,8 +51,9 @@ Why it is shaped like this:
 All commands start at the repository root. Use the PersonaDesk venv from Workshop 2 for the
 tests. WebUI needs only `pyyaml` and `cryptography`; any Python 3.11+ with those works.
 
-1. Check out the fork at the pinned workshop commit (once). The submodule follows branch
-   `personadesk-portal`:
+1. Check out the fork at the pinned commit (once). The submodule follows branch
+   `multilora-ux`, which contains this workshop's `personadesk-portal` work plus the
+   [UX workspace](../../ux-workspace/README.md) hub:
 
    ```powershell
    git submodule update --init external/hermes-webui

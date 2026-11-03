@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "persona-portal",
+  "order": 7,
+  "label": "Workshop 5",
+  "title": "PersonaDesk Portal",
+  "summary": "Give each persona a personalised, read-only Workbench beside Hermes WebUI's chat: work queue, drafts awaiting review and their evidence, laid out per persona and served by a single-persona sidecar behind WebUI's token-checked proxy.",
+  "status": "partial",
+  "optional": true,
+  "hardware": "CPU is enough for what is built so far",
+  "builds_on": ["personal-agent-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "PLAN.md", "title": "Plan"},
+    {"path": "docs/GAPS.md", "title": "WebUI extension gaps"},
+    {"path": "docs/VERIFY.md", "title": "Verification log"}
+  ],
+  "readiness": [
+    {"label": "Persona layouts", "path": "workshops/persona-portal/ux/catalog.json"}
+  ],
+  "commands": [
+    {"kind": "check", "label": "Unit tests", "cwd": ".", "run": "workshops\\personal-agent-multilora\\.venv\\Scripts\\python.exe -m pytest workshops/persona-portal/tests -q", "note": "Uses Workshop 2's environment."},
+    {"kind": "check", "label": "End-to-end smoke test", "cwd": ".", "run": "workshops\\personal-agent-multilora\\.venv\\Scripts\\python.exe workshops/persona-portal/scripts/smoke_e2e.py --webui-python <python-with-webui-requirements>"}
+  ],
+  "prompts": [
+    {"label": "Why a sidecar?", "prompt": "Workshop 5 serves the Workbench data from a loopback sidecar behind Hermes WebUI's proxy instead of from the extension itself. Explain why, and what the token-v1 header and proxy consent protect against."}
+  ],
+  "extensions": ["personadesk"]
+}
