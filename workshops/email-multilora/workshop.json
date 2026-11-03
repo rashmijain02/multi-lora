@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "email-multilora",
+  "order": 2,
+  "label": "Workshop 1",
+  "title": "Email Multi-LoRA",
+  "summary": "Train a generalist plus operations, finance and travel LoRA adapters on a small base model, compare them with a lexical baseline and learned routing (part A), then train per-persona reply adapters that later become PersonaDesk's writers (part B).",
+  "status": "built",
+  "optional": false,
+  "hardware": "CPU is enough for the 0.5B default; a GPU is faster and recommended for part B",
+  "builds_on": [],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "docs/LOCAL_SETUP.md", "title": "Local setup"},
+    {"path": "docs/CODE_COMPANION.md", "title": "Code companion"},
+    {"path": "FACILITATOR.md", "title": "Facilitator guide"},
+    {"path": "VALIDATION.md", "title": "Validation"},
+    {"path": "docs/PERSONA_EVALUATION_PLAN.md", "title": "Persona evaluation plan"},
+    {"path": "docs/AZURE_DEPLOYMENT.md", "title": "Azure deployment"}
+  ],
+  "readiness": [
+    {"label": "Python environment", "path": "workshops/email-multilora/.venv"}
+  ],
+  "commands": [
+    {"kind": "setup", "label": "Create the environment", "cwd": "workshops/email-multilora", "run": "python -m venv .venv"},
+    {"kind": "setup", "label": "Install the workshop package", "cwd": "workshops/email-multilora", "run": ".\\.venv\\Scripts\\python.exe -m pip install -e '.[dev]'"},
+    {"kind": "check", "label": "Lint", "cwd": "workshops/email-multilora", "run": ".\\.venv\\Scripts\\python.exe -m ruff check email_workshop tests scripts"},
+    {"kind": "check", "label": "Unit tests", "cwd": "workshops/email-multilora", "run": ".\\.venv\\Scripts\\python.exe -m pytest tests -q", "note": "Training tests are skipped unless the [training] extra is installed."},
+    {"kind": "try", "label": "Short pipeline run: prepare", "cwd": "workshops/email-multilora", "run": ".\\.venv\\Scripts\\python.exe -m email_workshop.cli --artifacts .\\artifacts\\smoke-01 prepare"},
+    {"kind": "try", "label": "Short pipeline run: train", "cwd": "workshops/email-multilora", "run": ".\\.venv\\Scripts\\python.exe -m email_workshop.cli --artifacts .\\artifacts\\smoke-01 train --device cuda --max-steps 2 --sample-limit 16", "note": "Needs the [training] extra and a CUDA GPU."}
+  ],
+  "prompts": [
+    {"label": "Explain Multi-LoRA", "prompt": "In plain language, explain what a LoRA adapter is and why serving several adapters on one base model (Multi-LoRA) is cheaper than serving several fine-tuned models. Use the email classification workshop in workshops/email-multilora as the example."},
+    {"label": "Generalist vs specialists", "prompt": "Workshop 1 compares a generalist adapter, specialist adapters and learned routing. What trade-offs should I look for in the results, and what would make me pick one over the others?"}
+  ],
+  "extensions": []
+}

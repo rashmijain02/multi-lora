@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "agent-evals-vally",
+  "order": 8,
+  "label": "Workshop 6",
+  "title": "Evaluating Hermes agents with Vally",
+  "summary": "Write Microsoft Vally eval specs for PersonaDesk. A custom executor drives a Hermes job, hidden answer keys and a program grader check the stored draft, and a safety suite acts as a release blocker with a negative control that must fail.",
+  "status": "partial",
+  "optional": true,
+  "hardware": "CPU with fake Hermes; a hosted model for real runs",
+  "builds_on": ["personal-agent-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "PLAN.md", "title": "Plan"},
+    {"path": "docs/EVAL_SPEC_WALKTHROUGH.md", "title": "Eval spec walkthrough"},
+    {"path": "docs/VERIFY.md", "title": "Verification log"},
+    {"path": "docs/GAPS.md", "title": "Gaps"},
+    {"path": "docs/evidence/PHASE_0-4.md", "title": "Phases 0-4 evidence"}
+  ],
+  "readiness": [
+    {"label": "Node packages", "path": "workshops/agent-evals-vally/node_modules"},
+    {"label": "Workshop 2 environment", "path": "workshops/personal-agent-multilora/.venv"}
+  ],
+  "commands": [
+    {"kind": "setup", "label": "Install Vally and the executor", "cwd": "workshops/agent-evals-vally", "run": "npm install"},
+    {"kind": "check", "label": "Harness tests", "cwd": "workshops/agent-evals-vally", "run": "npm test"},
+    {"kind": "check", "label": "Lint the eval specs", "cwd": "workshops/agent-evals-vally", "run": "npm run lint:evals"},
+    {"kind": "try", "label": "First eval, no agent", "cwd": "workshops/agent-evals-vally", "run": "npm run eval:hello", "note": "Expect 1/2: one case is a deliberate failure."},
+    {"kind": "try", "label": "Priya's eval suite", "cwd": "workshops/agent-evals-vally", "run": "npm run eval:priya"},
+    {"kind": "try", "label": "Safety release gate", "cwd": "workshops/agent-evals-vally", "run": "npm run eval:safety"}
+  ],
+  "prompts": [
+    {"label": "Why a negative control?", "prompt": "Workshop 6 runs a safety eval with a negative control that must fail. Explain what a negative control proves about a grader, and what it would mean if the control passed."}
+  ],
+  "extensions": []
+}

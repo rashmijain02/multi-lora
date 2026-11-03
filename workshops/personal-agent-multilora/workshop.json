@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "personal-agent-multilora",
+  "order": 4,
+  "label": "Workshop 2",
+  "title": "PersonaDesk agents on Hermes",
+  "summary": "Run one email assistant per persona on Hermes Agent: a Hermes profile per persona, the PersonaDesk plugin with persona-scoped tools and a guard hook, human review of every draft, and a local-only mail simulator.",
+  "status": "built",
+  "optional": false,
+  "hardware": "CPU with a hosted model; GPU for the full local stack",
+  "builds_on": ["email-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "docs/USER_GUIDE.md", "title": "User guide"},
+    {"path": "docs/SIMULATED_CORP_GUIDE.md", "title": "Simulated corporation guide"},
+    {"path": "LEARNING_PLAN.md", "title": "Learning plan"},
+    {"path": "PROPOSAL.md", "title": "Proposal"},
+    {"path": "docs/COST_MODEL.md", "title": "Cost model"},
+    {"path": "docs/DGX_SPARK_GUIDE.md", "title": "DGX Spark guide"},
+    {"path": "docs/evidence/ROUND_1_EVIDENCE.md", "title": "Round 1 evidence"},
+    {"path": "EMAIL_PLAYGROUND_PROPOSAL.md", "title": "Email playground proposal"}
+  ],
+  "readiness": [
+    {"label": "Python environment", "path": "workshops/personal-agent-multilora/.venv"},
+    {"label": "Operator allowlist", "path": "workshops/personal-agent-multilora/config/operators.json"}
+  ],
+  "commands": [
+    {"kind": "setup", "label": "Install dependencies", "cwd": "workshops/personal-agent-multilora", "run": "uv sync --extra dev --extra classification"},
+    {"kind": "setup", "label": "Create the operator allowlist", "cwd": "workshops/personal-agent-multilora", "run": "cp config/operators.example.json config/operators.json", "note": "Then replace your-os-username with your OS account name."},
+    {"kind": "check", "label": "Unit tests", "cwd": "workshops/personal-agent-multilora", "run": "uv run pytest -q"},
+    {"kind": "check", "label": "Lint", "cwd": "workshops/personal-agent-multilora", "run": "uv run ruff check ."},
+    {"kind": "try", "label": "Run one job with the fake worker", "cwd": "workshops/personal-agent-multilora", "run": "uv run personadesk --profile pd-priya --hermes-bin scripts/fake_hermes.py run --fixture priya-001"},
+    {"kind": "try", "label": "Show the job", "cwd": "workshops/personal-agent-multilora", "run": "uv run personadesk --profile pd-priya show <job-id>"},
+    {"kind": "try", "label": "Start the mail simulator", "cwd": "workshops/personal-agent-multilora", "run": "uv run pd-mail serve", "note": "SMTP 127.0.0.1:2525, IMAP 127.0.0.1:1143."}
+  ],
+  "prompts": [
+    {"label": "Why a guard hook?", "prompt": "PersonaDesk uses a guard hook and human review so nothing is ever sent automatically. Explain how a Hermes plugin hook can block a tool call, and why the persona comes from the active profile instead of a tool argument."},
+    {"label": "Profiles and skills", "prompt": "Explain how Hermes profiles, SOUL.md and plugins fit together, using the PersonaDesk personas (pd-priya, pd-daniel, pd-noah) as examples."}
+  ],
+  "extensions": []
+}
