@@ -133,6 +133,15 @@ Use the study-kit templates and the evidence from the workshops to make the deci
 under [Intended result](#intended-result). For managed hosting, see the email workshop's
 [Azure deployment guide](workshops/email-multilora/docs/AZURE_DEPLOYMENT.md).
 
+## Proposed research workshops
+
+[Change Assurance Lab](workshops/change-assurance-lab/PROPOSAL.md) proposes research-backed
+quality engineering for real SDLC workflows: a Hermes harness runs just-in-time counterexample
+tests and bounded goal-oriented hill climbing, with independently checked patch behavior and
+a local small-model selector. It includes recent research, eight labs, a fictional release
+scenario, and unattended shadow-mode workflows under fixed budgets. It is not implemented
+and does not authorize autonomous merges.
+
 ## What is included
 
 - a detailed guide for every day;
