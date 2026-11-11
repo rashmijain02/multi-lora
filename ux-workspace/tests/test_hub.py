@@ -40,7 +40,9 @@ def make_repo(tmp_path: Path, manifests: dict[str, object]) -> Path:
     for wid, data in manifests.items():
         folder = tmp_path / "workshops" / wid
         folder.mkdir(parents=True)
-        (folder / "README.md").write_text(f"# {wid}\n", encoding="utf-8")
+        doc_folder = tmp_path / "docs" / wid
+        doc_folder.mkdir(parents=True)
+        (doc_folder / "README.md").write_text(f"# {wid}\n", encoding="utf-8")
         (folder / "workshop.json").write_text(
             data if isinstance(data, str) else json.dumps(data), encoding="utf-8")
     return tmp_path
@@ -105,13 +107,37 @@ def test_folders_without_a_manifest_are_ignored(tmp_path):
     assert [w["id"] for w in registry.workshops] == ["demo"] and registry.errors == []
 
 
+def test_docs_are_read_from_central_folder_not_workshop(tmp_path):
+    repo = make_repo(tmp_path, {"demo": manifest()})
+    (repo / "workshops" / "demo" / "README.md").write_text("legacy", encoding="utf-8")
+    data = hub.load_registry(repo).get("demo")
+    assert hub.read_doc(data, "README.md", repo)["markdown"] == "# demo\n"
+
+    (repo / "docs" / "demo" / "README.md").unlink()
+    assert hub.load_registry(repo).workshops == []
+    with pytest.raises(hub.NotFound):
+        hub.read_doc(data, "README.md", repo)
+
+
+def test_nested_central_doc_is_supported(tmp_path):
+    repo = make_repo(tmp_path, {"demo": manifest()})
+    path = repo / "docs" / "demo" / "evidence" / "run.md"
+    path.parent.mkdir()
+    path.write_text("# Run\n", encoding="utf-8")
+    data = manifest(docs=[{"path": "evidence/run.md", "title": "Run"}])
+    assert hub.validate_manifest(data, repo / "workshops" / "demo") == []
+    assert hub.read_doc(data, "evidence/run.md", repo)["markdown"] == "# Run\n"
+    with pytest.raises(hub.NotFound):
+        hub.read_doc(data, "../next/README.md", repo)
+
+
 # ---- HTTP ----------------------------------------------------------------------------------
 
 @pytest.fixture()
 def server(tmp_path):
     repo = make_repo(tmp_path / "repo", {
         "demo": manifest(readiness=[{"label": "venv", "path": "workshops/demo/.venv"},
-                                    {"label": "readme", "path": "workshops/demo/README.md"}]),
+                                    {"label": "readme", "path": "docs/demo/README.md"}]),
         "next": manifest("next", order=2, builds_on=["demo"]),
     })
     (repo / "workshops" / "demo" / "secret.md").write_text("not declared", encoding="utf-8")

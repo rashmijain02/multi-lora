@@ -11,13 +11,13 @@
   "builds_on": ["email-multilora"],
   "docs": [
     {"path": "README.md", "title": "Start here"},
-    {"path": "docs/USER_GUIDE.md", "title": "User guide"},
-    {"path": "docs/SIMULATED_CORP_GUIDE.md", "title": "Simulated corporation guide"},
+    {"path": "USER_GUIDE.md", "title": "User guide"},
+    {"path": "SIMULATED_CORP_GUIDE.md", "title": "Simulated corporation guide"},
     {"path": "LEARNING_PLAN.md", "title": "Learning plan"},
     {"path": "PROPOSAL.md", "title": "Proposal"},
-    {"path": "docs/COST_MODEL.md", "title": "Cost model"},
-    {"path": "docs/DGX_SPARK_GUIDE.md", "title": "DGX Spark guide"},
-    {"path": "docs/evidence/ROUND_1_EVIDENCE.md", "title": "Round 1 evidence"},
+    {"path": "COST_MODEL.md", "title": "Cost model"},
+    {"path": "DGX_SPARK_GUIDE.md", "title": "DGX Spark guide"},
+    {"path": "evidence/ROUND_1_EVIDENCE.md", "title": "Round 1 evidence"},
     {"path": "EMAIL_PLAYGROUND_PROPOSAL.md", "title": "Email playground proposal"}
   ],
   "readiness": [

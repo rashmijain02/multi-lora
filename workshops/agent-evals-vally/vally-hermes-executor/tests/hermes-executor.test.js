@@ -12,7 +12,7 @@ const personadesk = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
   "personal-agent-multilora");
 const venvPython = path.join(personadesk, ".venv", process.platform === "win32" ? "Scripts/python.exe" : "bin/python");
 const skip = !existsSync(venvPython) && !process.env.PERSONADESK_PYTHON
-  ? "PersonaDesk .venv not installed (see workshops/personal-agent-multilora/README.md)" : false;
+  ? "PersonaDesk .venv not installed (see docs/personal-agent-multilora/README.md)" : false;
 
 const executor = new HermesExecutor();
 const workDirs = [];

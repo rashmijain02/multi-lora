@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 WORKSHOP_DIR = Path(__file__).resolve().parent.parent
-PROGRAM_TEMPLATE = WORKSHOP_DIR / "program.md"
+PROGRAM_TEMPLATE = WORKSHOP_DIR.parents[1] / "docs" / "autoresearch-spark" / "program.md"
 DEFAULT_RUNS_DIR = WORKSHOP_DIR / "runs"
 
 LOCKED_FILES = ("prepare.py", "pyproject.toml", "uv.lock")

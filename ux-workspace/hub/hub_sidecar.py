@@ -158,13 +158,15 @@ def validate_manifest(data: object, folder: Path) -> list[str]:
                 continue
             path = doc["path"]
             if not _is_safe_relative(path) or not path.endswith(".md"):
-                errors.append(f"{where}.path must be a relative '.md' path inside the workshop folder")
+                errors.append(f"{where}.path must be a relative '.md' path inside docs/<workshop-id>")
                 continue
             if path in seen:
                 errors.append(f"{where}.path '{path}' is listed twice")
             seen.add(path)
-            target = folder / path
-            if not _inside(target, folder) or not target.is_file():
+            repo_root = folder.parent.parent
+            doc_folder = repo_root / "docs" / folder.name
+            target = doc_folder / path
+            if not _inside(doc_folder, repo_root) or not _inside(target, doc_folder) or not target.is_file():
                 errors.append(f"{where}.path '{path}' does not exist")
             if not _text(doc["title"], 120):
                 errors.append(f"{where}.title must be non-empty text")
@@ -294,9 +296,9 @@ def read_doc(data: dict[str, Any], requested: str | None, repo_root: Path) -> di
     declared = {doc["path"]: doc["title"] for doc in data["docs"]}
     if not requested or requested not in declared:
         raise NotFound("That document is not listed in the workshop's manifest.")
-    folder = repo_root / "workshops" / data["id"]
+    folder = repo_root / "docs" / data["id"]
     target = folder / requested
-    if not _inside(target, folder) or not target.is_file():
+    if not _inside(folder, repo_root) or not _inside(target, folder) or not target.is_file():
         raise NotFound("Document missing.")
     if target.stat().st_size > MAX_DOC_BYTES:
         raise DocTooLarge("Document is larger than 512 KB.")

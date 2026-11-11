@@ -12,10 +12,10 @@
   "docs": [
     {"path": "README.md", "title": "Start here"},
     {"path": "PLAN.md", "title": "Plan"},
-    {"path": "docs/EVAL_SPEC_WALKTHROUGH.md", "title": "Eval spec walkthrough"},
-    {"path": "docs/VERIFY.md", "title": "Verification log"},
-    {"path": "docs/GAPS.md", "title": "Gaps"},
-    {"path": "docs/evidence/PHASE_0-4.md", "title": "Phases 0-4 evidence"}
+    {"path": "EVAL_SPEC_WALKTHROUGH.md", "title": "Eval spec walkthrough"},
+    {"path": "VERIFY.md", "title": "Verification log"},
+    {"path": "GAPS.md", "title": "Gaps"},
+    {"path": "evidence/PHASE_0-4.md", "title": "Phases 0-4 evidence"}
   ],
   "readiness": [
     {"label": "Node packages", "path": "workshops/agent-evals-vally/node_modules"},

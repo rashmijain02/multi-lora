@@ -42,7 +42,7 @@
       "09-sofia-alvarez-operations-manager.md",
       "10-noah-williams-executive-assistant.md"
     ],
-    "generic_baseline_specification": "README.md"
+    "generic_baseline_specification": "../../../../docs/email-multilora/data/manual_full_response/README.md"
   },
   "validation": {
     "unique_ids_per_file": 2103,

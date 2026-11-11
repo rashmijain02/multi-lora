@@ -1,0 +1,14 @@
+{
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "device": "cuda",
+  "dtype": "float16",
+  "max_new_tokens": 192,
+  "max_length": 768,
+  "batch_size": 1,
+  "learning_rate": 0.0002,
+  "max_steps": 30,
+  "lora_rank": 8,
+  "seed": 42,
+  "gradient_accumulation_steps": 4
+}

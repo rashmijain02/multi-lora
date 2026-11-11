@@ -252,7 +252,10 @@ def make_handlers(rt: Runtime) -> dict[str, Callable[..., str]]:
         "pd_draft_reply": draft_reply,
         "pd_classify_message": classify_message,
     }
-    return {name: _guard(rt, name, fn) for name, fn in impls.items()}
+    handlers = {name: _guard(rt, name, fn) for name, fn in impls.items()}
+    from .mail_tools import make_mail_handlers  # lazy: mail_tools imports this module
+
+    return {**handlers, **make_mail_handlers(rt)}
 
 
 _FIXTURE = {"type": "string", "description": "Fixture ID, e.g. priya-001."}

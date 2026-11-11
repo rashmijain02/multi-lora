@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "leadership-evidence-lab",
+  "order": 10,
+  "label": "Configurable modeling experiments",
+  "title": "Empathy, Emotion, and Dialogue Evidence Lab",
+  "summary": "Configurable train/validation/test workflows for fictional empathy, GoEmotions emotion classification, and EmpatheticDialogues response generation. Small local GPU verification; no leadership assessment.",
+  "status": "partial",
+  "optional": true,
+  "hardware": "CPU baseline; local Qwen 0.5B on a 10 GB CUDA GPU; larger Qwen/Nemotron profiles need separate hardware",
+  "builds_on": ["email-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Workshop guide"},
+    {"path": "EXPERIMENTS.md", "title": "Configurable three-task training and evaluation"},
+    {"path": "PROPOSAL.md", "title": "Research proposal and later phases"},
+    {"path": "LARGE_MODEL_EXPERIMENT.md", "title": "DGX Spark and larger-model experiment proposal"},
+    {"path": "VALIDATION.md", "title": "Measured initialization evidence"}
+  ],
+  "readiness": [
+    {"label": "Workshop environment", "path": "workshops/leadership-evidence-lab/.venv"}
+  ],
+  "commands": [
+    {"kind": "setup", "label": "Install notebook, data, and training dependencies", "cwd": "workshops/leadership-evidence-lab", "run": "uv sync --extra dev --extra training --extra data"},
+    {"kind": "check", "label": "Unit tests", "cwd": "workshops/leadership-evidence-lab", "run": "uv run pytest -q"},
+    {"kind": "check", "label": "Lint", "cwd": "workshops/leadership-evidence-lab", "run": "uv run ruff check empathy_lab tests"}
+  ],
+  "prompts": [
+    {"label": "Understand the three tasks", "prompt": "Explain the configurable fictional empathy, GoEmotions emotion-classification, and EmpatheticDialogues response-generation workflows; their split/provenance validation and separate metrics; and why none establishes a validated leadership measure."}
+  ],
+  "extensions": []
+}

@@ -1,0 +1,14 @@
+{
+  "model_id": "nvidia/Llama-3.1-Nemotron-Nano-8B-v1",
+  "revision": "54641c1611fcff44fa4865626462445e0a153fc7",
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "max_new_tokens": 192,
+  "max_length": 1024,
+  "batch_size": 1,
+  "learning_rate": 0.0001,
+  "max_steps": 100,
+  "lora_rank": 8,
+  "seed": 42,
+  "gradient_accumulation_steps": 8
+}

@@ -51,7 +51,7 @@ WebUI sidecar proxy ── checks login + consent, strips cookies, adds token-v1
 Hub sidecar  ux-workspace/hub/hub_sidecar.py   (Python stdlib, GET only)
    │  discovers  workshops/*/workshop.json  and validates each one
    ▼
-Repository files (read only): README.md, PLAN.md, docs/... declared by each workshop
+Repository files (read only): docs/<workshop-id>/... declared by each workshop
 ```
 
 Three pieces, each with one job:
@@ -59,7 +59,7 @@ Three pieces, each with one job:
 1. **Workshop manifests** (`workshops/<dir>/workshop.json`). Each workshop describes itself. The
    hub has no hard-coded list, so a new workshop appears when its manifest is valid.
 2. **Hub sidecar** (`ux-workspace/hub/hub_sidecar.py`). WebUI extensions cannot add backend
-   routes (Workshop 5 [GAP-2](../workshops/persona-portal/docs/GAPS.md)), so a small loopback
+   routes (Workshop 5 [GAP-2](../docs/persona-portal/GAPS.md)), so a small loopback
    service reads the manifests and the declared docs and serves them as JSON.
 3. **Workshop Hub extension** (`external/hermes-webui/extensions/workshop-hub/`). Plain
    JavaScript and CSS, injected by WebUI. It builds the panel with DOM APIs and only uses
@@ -104,7 +104,7 @@ Every workshop folder that wants to appear in the hub adds one file:
 | `optional` | Boolean. | Mirrors "(optional)" in the root README. |
 | `hardware` | Text. | The first question learners ask. |
 | `builds_on` | Ids of other workshops. Each must exist. | Draws the dependency line. |
-| `docs` | At least one. Each `path` is relative to the workshop folder, ends in `.md`, has no `..`, and the file exists. | The hub serves **only** these files. |
+| `docs` | At least one. Each `path` is relative to `docs/<workshop-id>/`, ends in `.md`, has no `..`, and the file exists. | The hub serves **only** these files. |
 | `readiness` | Optional. Each `path` is relative to the **repository root**, with no `..`. | The hub reports whether it exists (for example another workshop's environment). It never reads it. |
 | `commands` | `kind` is `setup`, `check`, or `try`. `cwd` is relative to the **repository root**. `run` is copied from the workshop's README. Optional `note`. | Displayed for copying. Nothing runs them in phase 1. |
 | `prompts` | Optional. `label` and `prompt` text. | Pre-fills WebUI's chat box. |
@@ -138,7 +138,7 @@ The hub is a reading tool. Phase 1 adds no way to change anything on disk.
 | Loopback only | The sidecar binds to `127.0.0.1`. |
 | Only WebUI can call it | Every route except `/health` needs the token-v1 header, compared in constant time; the token file is re-read on each request. WebUI adds the header only after login and proxy consent. |
 | Read only | `GET` only; every other method gets 405. |
-| No arbitrary file reads | `/doc` serves a path only if it is listed in that workshop's `docs`, after resolving it and checking that it stays inside the workshop folder. Size cap 512 KB. |
+| No arbitrary file reads | `/doc` serves a path only if it is listed in that workshop's `docs`, after resolving it and checking that it stays inside `docs/<workshop-id>/` within the repository. Size cap 512 KB. |
 | No command execution | Commands are text for copying. Running checks from the UI is phase 2, behind its own design review. |
 | No HTML injection | Panel text uses `textContent`. Docs use WebUI's `renderMd`, which escapes raw HTML; without it, docs show as plain text. |
 | Chat stays in the learner's hands | Prompts are only placed in the chat box; the learner presses Send. |
@@ -156,6 +156,7 @@ ux-workspace/
 └── tests/test_hub.py        unit tests, including "every real workshop.json is valid"
 
 workshops/<dir>/workshop.json   one per workshop
+docs/<dir>/                    that workshop's README, plans, guides, and evidence
 
 external/hermes-webui/extensions/  (fork, branch multilora-ux)
 ├── multilora-manifest.json  lists workshop-hub and personadesk
@@ -166,7 +167,7 @@ external/hermes-webui/extensions/  (fork, branch multilora-ux)
 
 | Phase | Goal | Done when |
 |---|---|---|
-| 0. Facts | Know what WebUI extensions can do. | Done in Workshop 5 ([VERIFY.md](../workshops/persona-portal/docs/VERIFY.md)). |
+| 0. Facts | Know what WebUI extensions can do. | Done in Workshop 5 ([VERIFY.md](../docs/persona-portal/VERIFY.md)). |
 | 1. Read-only hub | Manifests for all six workshops, hub sidecar, hub extension, launcher. | Unit tests pass; every real manifest validates; the smoke test passes against real WebUI (login, consent, list, detail, doc, doc allowlist, token checks, script served). |
 | 2. Run checks from the UI | A "Run" button for `check` commands only, with live logs. | A design note covers: a fixed allowlist read from manifests at sidecar start (never from the request), WebUI's CSRF token for POST (Workshop 5 GAP-5), one run at a time, a timeout, and no shell. Then tests and the smoke test cover it. |
 | 3. Workshop panels | Rich views per workshop: embed the Workbench, show Vally results, chart AutoResearch runs and router parity rounds. | Each panel reads only declared result files and reports only measured numbers. |
@@ -176,6 +177,7 @@ external/hermes-webui/extensions/  (fork, branch multilora-ux)
 ## 9. How to add a new workshop
 
 1. Create `workshops/<dir>/workshop.json` following [§4](#4-the-workshop-manifest-contract-workshopjson-schema-1).
+   Put its documentation under `docs/<dir>/`; manifest doc paths are relative to that folder.
 2. Copy commands from your README; do not invent new ones.
 3. Run the hub tests (see [README.md](README.md)). The test "every real workshop.json is valid"
    names the field that is wrong.
