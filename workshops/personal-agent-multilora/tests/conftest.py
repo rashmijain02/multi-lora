@@ -16,6 +16,10 @@ if CLM_SRC.is_dir() and str(CLM_SRC) not in sys.path:
 
 from hermes_plugin.store import open_store
 from hermes_plugin.tools import Runtime, make_handlers
+from mailsim.config import load_config
+from mailsim.jmap import JmapServer
+from mailsim.jmap_client import JmapClient
+from mailsim.jmap_seed import PERSONAS, build_all, seed
 
 FAKE_HERMES = str(WORKSHOP / "scripts" / "fake_hermes.py")
 
@@ -50,3 +54,29 @@ def runtime(root: Path, db: Path, profile: str | None, **settings) -> Runtime:
 
 def call(rt: Runtime, tool: str, **args) -> dict:
     return json.loads(make_handlers(rt)[tool](args))
+
+
+@pytest.fixture
+def jmap(root, tmp_path):
+    """A JMAP playground server on a free loopback port, with its own empty database."""
+    config = load_config(root)
+    server = JmapServer(config, tmp_path / "jmap.db", port=0).start()
+    yield config, server
+    server.stop()
+
+
+def client_for(jmap, persona: str) -> JmapClient:
+    config, server = jmap
+    return JmapClient(server.base_url, PERSONAS[persona]["address"], config.password)
+
+
+@pytest.fixture
+def seeded(jmap):
+    """Every persona seeded; returns {persona: (client, pack, fixture_id -> email_id)}."""
+    out = {}
+    for persona, pack in build_all().items():
+        client = client_for(jmap, persona)
+        report = seed(client, pack)
+        assert report.ok, report
+        out[persona] = (client, pack, report.mapping)
+    return out

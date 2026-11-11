@@ -9,3 +9,6 @@ when editing any code, configuration, notebook, or documentation in this reposit
   working directory is required. Do not replace runtime discovery with hardcoded absolute paths.
 - Keep unavoidable container-internal paths, API routes, and URLs distinct from checkout paths.
 - Clear saved notebook outputs before publishing; they can expose local paths or private data.
+- Keep workshop documentation in `docs/<workshop-id>/`, with one folder per workshop.
+  Keep runtime input Markdown (policies and persona profiles) with
+  the workshop code or data that consumes it.

@@ -6,7 +6,7 @@ to WebUI core is a last resort; it goes in its own `core:` commit on branch `mul
 is listed here.
 
 Workshop 5's gaps still apply and are not repeated:
-[GAP-1 to GAP-5](../../workshops/persona-portal/docs/GAPS.md) (gallery install, no backend
+[GAP-1 to GAP-5](../../docs/persona-portal/GAPS.md) (gallery install, no backend
 routes, manifest array form, single user, CSRF on POST).
 
 | ID | Gap | Evidence | Impact | Decision |

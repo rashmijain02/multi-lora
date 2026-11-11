@@ -4,6 +4,7 @@
     "host": "127.0.0.1",
     "smtp_port": 2525,
     "imap_port": 1143,
+    "jmap_port": 8088,
     "authserv_id": "mailsim.personadesk.test",
     "shared_password": "personadesk-local"
   },

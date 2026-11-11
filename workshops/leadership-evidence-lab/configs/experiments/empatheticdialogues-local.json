@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "name": "empatheticdialogues-local",
+  "task": "empathetic_dialogues",
+  "model_profile": "../qwen-local.json",
+  "model_overrides": {
+    "dtype": "bfloat16",
+    "max_length": 1024,
+    "max_new_tokens": 128,
+    "max_steps": 20,
+    "eval_steps": 10,
+    "gradient_accumulation_steps": 2,
+    "gradient_checkpointing": true
+  },
+  "dataset": {
+    "revision": "56f234d77b7dd1f005fd365bb17769cfe346c3c84295b69bc069c8ccb83be03d"
+  },
+  "limits": {"train": 64, "validation": 16, "test": 16},
+  "seed": 42
+}

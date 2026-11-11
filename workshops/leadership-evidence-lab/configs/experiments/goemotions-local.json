@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "name": "goemotions-local",
+  "task": "go_emotions",
+  "model_profile": "../qwen-local.json",
+  "model_overrides": {
+    "dtype": "bfloat16",
+    "max_length": 1024,
+    "max_new_tokens": 128,
+    "max_steps": 20,
+    "eval_steps": 10,
+    "gradient_accumulation_steps": 2,
+    "gradient_checkpointing": true
+  },
+  "dataset": {"revision": "add492243ff905527e67aeb8b80c082af02207c3"},
+  "limits": {"train": 64, "validation": 16, "test": 16},
+  "seed": 42
+}

@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 WORKSHOP = Path(__file__).resolve().parents[1]
 PLUGIN_SOURCE = WORKSHOP / "hermes_plugin"
@@ -119,7 +120,11 @@ def main() -> int:
                         help="Hermes provider for --model (default: custom, needs --base-url; "
                              "e.g. copilot uses Hermes's stored credential instead)")
     parser.add_argument("--base-url", help="e.g. http://127.0.0.1:8000/v1 (vLLM or llama.cpp)")
+    parser.add_argument("--mail-url", help="enable the mail_* tools against the JMAP playground, "
+                                           "e.g. http://127.0.0.1:8088 (loopback only)")
     args = parser.parse_args()
+    if args.mail_url and urlparse(args.mail_url).hostname not in ("127.0.0.1", "localhost", "::1"):
+        parser.error("--mail-url must be a loopback address")
     if args.base_url and not args.model:
         parser.error("--base-url needs --model")
     if args.model and (args.provider == "custom") != bool(args.base_url):
@@ -138,6 +143,7 @@ def main() -> int:
         "workshop_root": str(WORKSHOP),
         "writer_backend": args.writer,
         **({"writer_url": args.writer_url} if args.writer == "http" else {}),
+        **({"mail_url": args.mail_url} if args.mail_url else {}),
     }
     for client_id, grant in permissions["personas"].items():
         if not grant["enabled"]:

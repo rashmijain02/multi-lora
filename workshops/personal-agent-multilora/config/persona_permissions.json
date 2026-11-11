@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-25.1",
+  "version": "2026-11-02.1",
   "defaults": {
     "max_turns": 8,
     "worker_timeout_seconds": 600,
@@ -12,7 +12,8 @@
       "hermes_profile": "pd-priya",
       "writer_adapter": "priya-raman",
       "tasks": ["draft_reply", "escalation_packet"],
-      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message"],
+      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message",
+                "mail_search", "mail_get", "mail_get_thread", "mail_update_tags", "mail_set_read", "mail_move", "mail_save_draft"],
       "policies": ["support-escalation", "support-refunds"],
       "checks": ["sla_status", "refund_eligibility"],
       "blocked_actions": ["send_email", "issue_refund", "promise_fix_date", "change_account"]
@@ -22,7 +23,8 @@
       "hermes_profile": "pd-daniel",
       "writer_adapter": "daniel-okafor",
       "tasks": ["draft_reply", "approval_packet"],
-      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message"],
+      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message",
+                "mail_search", "mail_get", "mail_get_thread", "mail_update_tags", "mail_set_read", "mail_move", "mail_save_draft"],
       "policies": ["finance-approvals", "finance-vendor-payments"],
       "checks": ["invoice_po_match", "approval_threshold"],
       "blocked_actions": ["send_email", "approve_payment", "release_funds", "change_bank_details"]
@@ -32,7 +34,8 @@
       "hermes_profile": "pd-noah",
       "writer_adapter": "noah-williams",
       "tasks": ["draft_reply", "travel_options"],
-      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message"],
+      "tools": ["pd_read_fixture", "pd_get_policy", "pd_run_check", "pd_draft_reply", "pd_classify_message",
+                "mail_search", "mail_get", "mail_get_thread", "mail_update_tags", "mail_set_read", "mail_move", "mail_save_draft"],
       "policies": ["travel-policy", "calendar-etiquette"],
       "checks": ["calendar_conflict", "travel_policy"],
       "blocked_actions": ["send_email", "book_travel", "accept_invite", "share_itinerary_externally"]

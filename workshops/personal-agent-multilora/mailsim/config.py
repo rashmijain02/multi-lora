@@ -26,6 +26,7 @@ class MailConfig:
     authserv_id: str
     password: str
     accounts: dict[str, Account]
+    jmap_port: int = 8088
 
     def account(self, address: str) -> Account | None:
         return self.accounts.get(address.strip().lower())
@@ -52,4 +53,5 @@ def load_config(root: Path, **overrides: Any) -> MailConfig:
     }
     return MailConfig(host=server["host"], smtp_port=int(server["smtp_port"]),
                       imap_port=int(server["imap_port"]), authserv_id=server["authserv_id"],
-                      password=server["shared_password"], accounts=accounts)
+                      password=server["shared_password"], accounts=accounts,
+                      jmap_port=int(server.get("jmap_port", 8088)))

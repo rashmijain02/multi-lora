@@ -18,12 +18,20 @@ import asyncio
 import imaplib
 import json
 import sys
+import time
 from pathlib import Path
+
+import requests
 
 from hermes_plugin.paths import artifacts_dir, safe_child, workshop_root
 
 from .client import body_text, list_inbox, read_message, send_mail
 from .config import load_config
+from .jmap import JmapServer
+from .jmap_client import JmapClient, JmapError
+from .jmap_seed import PERSONAS, build_all, manifest
+from .jmap_seed import seed as jmap_import
+from .jmapstore import JmapStore
 from .server import MailServer
 from .store import MailStore
 
@@ -32,6 +40,10 @@ FIXTURE_HEADER = "X-PersonaDesk-Fixture"
 
 def default_db(root: Path) -> Path:
     return artifacts_dir(root) / "mail" / "mail.db"
+
+
+def default_jmap_db(root: Path) -> Path:
+    return artifacts_dir(root) / "mail" / "jmap.db"
 
 
 def seed(config, root: Path, persona: str | None = None, port: int | None = None) -> list[dict]:
@@ -55,7 +67,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pd-mail", description=__doc__.split("\n\n")[0],
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--root", help="Workshop root (default: auto-detect)")
-    parser.add_argument("--db", help="Mail store (default: artifacts/mail/mail.db)")
+    parser.add_argument("--db", help="Store path (default: artifacts/mail/mail.db for SMTP/IMAP,"
+                        " artifacts/mail/jmap.db for JMAP)")
     subs = parser.add_subparsers(dest="command", required=True)
 
     serve = subs.add_parser("serve", help="Run SMTP + IMAP on loopback until Ctrl+C")
@@ -86,6 +99,17 @@ def build_parser() -> argparse.ArgumentParser:
     seed_p.add_argument("--persona", help="Only this persona's fixtures")
 
     subs.add_parser("reset", help="Delete every stored message")
+
+    jserve = subs.add_parser("jmap-serve", help="Run the JMAP playground on loopback")
+    jserve.add_argument("--port", type=int, help="Default: jmap_port in config/mailboxes.json")
+
+    jseed = subs.add_parser("jmap-seed", help="Import the synthetic mailbox pack over JMAP")
+    jseed.add_argument("--persona", help="Only this persona (default: all three)")
+    jseed.add_argument("--port", type=int)
+    jseed.add_argument("--manifest", action="store_true",
+                       help="Print the fixture manifest and exit (no server needed)")
+
+    subs.add_parser("jmap-reset", help="Empty every JMAP mailbox (the JMAP store only)")
     return parser
 
 
@@ -94,6 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     root = workshop_root(args.root)
     config = load_config(root)
     db = Path(args.db) if args.db else default_db(root)
+    jmap_db = Path(args.db) if args.db else default_jmap_db(root)
 
     def emit(payload) -> None:
         print(json.dumps(payload, indent=2, ensure_ascii=False, default=str))
@@ -136,11 +161,46 @@ def main(argv: list[str] | None = None) -> int:
             store.reset()
             store.close()
             emit({"ok": True, "reset": "all mailboxes emptied"})
+        elif args.command == "jmap-serve":
+            jmap = JmapServer(config, jmap_db, port=args.port).start()
+            print(f"mailsim: JMAP {jmap.base_url}  (loopback only, no sending; Ctrl+C to stop)",
+                  flush=True)
+            try:
+                while True:
+                    time.sleep(3600)
+            except KeyboardInterrupt:
+                pass
+            finally:
+                jmap.stop()
+        elif args.command == "jmap-seed":
+            packs = build_all()
+            if args.persona and args.persona not in packs:
+                raise KeyError(f"Unknown persona {args.persona!r}; choose from {sorted(packs)}.")
+            if args.manifest:
+                emit(manifest({p: v for p, v in packs.items()
+                               if not args.persona or p == args.persona}))
+                return 0
+            base = f"http://{config.host}:{args.port or config.jmap_port}"
+            results = {}
+            for persona, pack in packs.items():
+                if args.persona and persona != args.persona:
+                    continue
+                report = jmap_import(
+                    JmapClient(base, PERSONAS[persona]["address"], config.password), pack)
+                results[persona] = {"imported": report.imported, "already_present": report.present,
+                                    "failed": report.failed, "ok": report.ok}
+            emit(results)
+            return 0 if all(r["ok"] for r in results.values()) else 1
+        elif args.command == "jmap-reset":
+            store = JmapStore(jmap_db)
+            store.reset()
+            store.close()
+            emit({"ok": True, "reset": "all JMAP mailboxes emptied"})
         return 0
-    except (OSError, ValueError, KeyError, imaplib.IMAP4.error) as exc:
+    except (OSError, ValueError, KeyError, JmapError, imaplib.IMAP4.error) as exc:
+        refused = isinstance(exc, ConnectionRefusedError | requests.ConnectionError)
         emit({"ok": False, "error": type(exc).__name__, "message": str(exc),
-              "hint": "Is `pd-mail serve` running?"
-              if isinstance(exc, ConnectionRefusedError) else None})
+              "hint": "Is `pd-mail serve` / `pd-mail jmap-serve` running?" if refused else None})
         return 2
 
 

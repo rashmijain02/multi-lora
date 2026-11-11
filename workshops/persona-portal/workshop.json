@@ -12,8 +12,8 @@
   "docs": [
     {"path": "README.md", "title": "Start here"},
     {"path": "PLAN.md", "title": "Plan"},
-    {"path": "docs/GAPS.md", "title": "WebUI extension gaps"},
-    {"path": "docs/VERIFY.md", "title": "Verification log"}
+    {"path": "GAPS.md", "title": "WebUI extension gaps"},
+    {"path": "VERIFY.md", "title": "Verification log"}
   ],
   "readiness": [
     {"label": "Persona layouts", "path": "workshops/persona-portal/ux/catalog.json"}

@@ -12,7 +12,7 @@
   "docs": [
     {"path": "README.md", "title": "Start here"},
     {"path": "PLAN.md", "title": "Plan"},
-    {"path": "docs/evidence/ROUTER_PARITY.md", "title": "Router parity evidence"}
+    {"path": "evidence/ROUTER_PARITY.md", "title": "Router parity evidence"}
   ],
   "readiness": [
     {"label": "Python environment", "path": "workshops/slm-task-models/.venv"},

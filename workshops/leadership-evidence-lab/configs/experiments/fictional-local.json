@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "name": "fictional-local",
+  "task": "fictional_empathy",
+  "model_profile": "../qwen-local.json",
+  "model_overrides": {
+    "dtype": "bfloat16",
+    "max_length": 1024,
+    "max_new_tokens": 256,
+    "max_steps": 20,
+    "eval_steps": 10,
+    "gradient_accumulation_steps": 2,
+    "gradient_checkpointing": true
+  },
+  "dataset": {"path": "data/fictional_support.jsonl"},
+  "limits": {"train": null, "validation": null, "test": null},
+  "seed": 42
+}

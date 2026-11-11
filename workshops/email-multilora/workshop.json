@@ -11,12 +11,12 @@
   "builds_on": [],
   "docs": [
     {"path": "README.md", "title": "Start here"},
-    {"path": "docs/LOCAL_SETUP.md", "title": "Local setup"},
-    {"path": "docs/CODE_COMPANION.md", "title": "Code companion"},
+    {"path": "LOCAL_SETUP.md", "title": "Local setup"},
+    {"path": "CODE_COMPANION.md", "title": "Code companion"},
     {"path": "FACILITATOR.md", "title": "Facilitator guide"},
     {"path": "VALIDATION.md", "title": "Validation"},
-    {"path": "docs/PERSONA_EVALUATION_PLAN.md", "title": "Persona evaluation plan"},
-    {"path": "docs/AZURE_DEPLOYMENT.md", "title": "Azure deployment"}
+    {"path": "PERSONA_EVALUATION_PLAN.md", "title": "Persona evaluation plan"},
+    {"path": "AZURE_DEPLOYMENT.md", "title": "Azure deployment"}
   ],
   "readiness": [
     {"label": "Python environment", "path": "workshops/email-multilora/.venv"}

@@ -71,7 +71,8 @@ needs a Hermes Agent install that WebUI can find; the hub itself does not.
 ## Add a workshop
 
 Create `workshops/<dir>/workshop.json` ([PLAN.md §4](PLAN.md#4-the-workshop-manifest-contract-workshopjson-schema-1)
-has every field), then validate it:
+has every field). Put its documentation under `docs/<dir>/`; each manifest doc path
+is relative to that documentation folder. Then validate it:
 
 ```powershell
 python ux-workspace/hub/hub_sidecar.py --check

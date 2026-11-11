@@ -61,4 +61,4 @@ Keep these concepts separate throughout the study:
 
 ## Companion workshop
 
-Use the [email Multi-LoRA workshop](../workshops/email-multilora/README.md) alongside Days 2, 4, 7, and 8. Its three notebooks implement multi-label data preparation, four independently trained adapters, text-only routing, held-out evaluation, and optional static vLLM serving. It uses a small Qwen base for accessibility and does not imply Nemotron/NIM support.
+Use the [email Multi-LoRA workshop](../docs/email-multilora/README.md) alongside Days 2, 4, 7, and 8. Its three notebooks implement multi-label data preparation, four independently trained adapters, text-only routing, held-out evaluation, and optional static vLLM serving. It uses a small Qwen base for accessibility and does not imply Nemotron/NIM support.
