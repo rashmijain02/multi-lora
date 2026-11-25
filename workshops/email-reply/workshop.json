@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "email-reply",
+  "order": 9,
+  "label": "Workshop 7",
+  "title": "Email reply QLoRA SFT and locally judged GRPO",
+  "summary": "Compare prompt-only baseline drafting, 4-bit QLoRA supervised fine-tuning, and checkpoint-initialized QLoRA GRPO on thread-grouped held-out email conversations.",
+  "status": "built",
+  "optional": true,
+  "hardware": "A 12 GB NVIDIA GPU for 4-bit QLoRA SFT and GRPO (Qwen3-4B default); input preparation and unit tests run on CPU",
+  "builds_on": ["email-multilora"],
+  "docs": [
+    {"path": "README.md", "title": "Start here"},
+    {"path": "PLAN.md", "title": "Plan and design"}
+  ],
+  "readiness": [
+    {"label": "CUDA training environment", "path": "workshops/email-reply/.venv"},
+    {"label": "Prepared reply pairs", "path": "workshops/email-reply/input/enron/reply-conversations.jsonl"}
+  ],
+  "commands": [
+    {"kind": "setup", "label": "Create the CUDA training environment", "cwd": "workshops/email-reply", "run": "uv venv .venv --python 3.12"},
+    {"kind": "setup", "label": "Install PyTorch (CUDA 12.8) and training dependencies", "cwd": "workshops/email-reply", "run": "uv pip install --python .venv\\Scripts\\python.exe --index-url https://pypi.org/simple --extra-index-url https://download.pytorch.org/whl/cu128 --index-strategy unsafe-best-match \"torch==2.10.0+cu128\" -r requirements.txt"},
+    {"kind": "check", "label": "Unit tests", "cwd": "workshops/email-reply", "run": ".\\.venv\\Scripts\\python.exe -m unittest discover -s tests"},
+    {"kind": "try", "label": "Bounded 1-step SFT GPU smoke check", "cwd": "workshops/email-reply", "run": ".\\.venv\\Scripts\\python.exe -m sft.experiment --smoke", "note": "Verifies base generation, 1 QLoRA SFT step, PEFT reload, metrics.jsonl, and diagnostic plots on GPU."},
+    {"kind": "try", "label": "Full baseline vs. QLoRA SFT comparison", "cwd": "workshops/email-reply", "run": ".\\.venv\\Scripts\\python.exe -m sft.experiment", "note": "Add --show-private to write side-by-side held-out conversations, drafts, and references locally."},
+    {"kind": "try", "label": "Checkpoint-initialized QLoRA GRPO smoke check", "cwd": "workshops/email-reply", "run": ".\\.venv\\Scripts\\python.exe -m grpo.experiment --sft-run output\\sft\\<sft-run-id> --smoke", "note": "Continues from a saved SFT run with a frozen local rubric judge, frozen sft_ref KL, metrics.jsonl, and 3-stage comparison plots."}
+  ],
+  "prompts": [
+    {"label": "SFT vs. RFT on real mail", "prompt": "Workshop 7 fine-tunes Qwen3-4B on Enron conversation-to-reply pairs with reply-only loss masking instead of starting with RFT. Explain why SFT comes first here, why reference-token loss is a fit diagnostic rather than factual correctness, and what missing mailbox context means for grading."},
+    {"label": "Thread-grouped holdout", "prompt": "In workshops/email-reply, Enron exports do not have canonical thread IDs, yet splitting randomly by row would leak quoted history across train and test. Explain how inferred thread and quote grouping works and its limitations."}
+  ],
+  "extensions": []
+}
