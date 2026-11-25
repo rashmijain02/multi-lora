@@ -35,3 +35,8 @@ workshops/autoresearch-spark/upstream/
 workshops/autoresearch-spark/runs/
 # SLM task-models workshop: generated data, adapters and predictions stay local
 workshops/slm-task-models/runs/
+
+# Legacy local Enron data and generated workshop outputs.
+/input/enron/
+/workshops/email-reply/output/
+unsloth_compiled_cache/

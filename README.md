@@ -16,7 +16,8 @@ Work through the stages in order. Each stage produces something the next one use
 | 6. Workshop 4 (optional) | Let a Hermes agent run guarded training experiments (AutoResearch) | Hermes concepts and the "agent never grades itself" rule from stage 4 | A 10 GB NVIDIA GPU (light tier) or a DGX Spark |
 | 7. Workshop 5 (optional) | Give each persona a personalised, read-only Workbench in Hermes WebUI (extension on our fork) | PersonaDesk personas, jobs and drafts from stage 4 | CPU is enough for what is built so far |
 | 8. Workshop 6 (optional) | Evaluate Hermes agents with Vally: pass/fail release gates per persona and for safety | PersonaDesk driver, fixtures and guard from stage 4 | CPU with fake Hermes; a hosted model for real runs |
-| 9. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–8 | — |
+| 9. Workshop 7 (optional) | Compare prompt-only baseline drafting, 4-bit QLoRA SFT, and checkpoint-initialized QLoRA GRPO (`Qwen3-4B`) on thread-grouped held-out email conversations | LoRA reply-adapter concepts from stage 3 | A 12 GB NVIDIA GPU for 4-bit QLoRA SFT and GRPO; CPU for input preparation and unit tests |
+| 10. Decide | Choose a serving engine and an Azure path | Evidence from stages 1–9 | — |
 
 To browse every workshop in one place (summaries, docs, commands, and starter prompts), open the
 [UX workspace](ux-workspace/README.md): the **Workshop Hub** inside Hermes WebUI on our fork.
@@ -130,7 +131,17 @@ program grader check the stored draft; and a safety suite acts as a release bloc
 negative control that must fail. Everything runs with fake Hermes on a CPU. Start with the
 [plan](docs/agent-evals-vally/PLAN.md).
 
-### Stage 9: Decide
+### Stage 9: Workshop 7, Email reply QLoRA SFT and locally judged GRPO
+
+[`workshops/email-reply`](workshops/email-reply/README.md) moves from synthetic or curated
+persona mail to real corporate threads prepared as conversation-to-reply pairs (with
+`tools/prepare_input.py` for `.eml`, `.mbox`, JSON, CSV/JSONL, and plain-text exports). It compares
+prompt-only `Qwen3-4B-Instruct-2507`, 4-bit Unsloth QLoRA SFT, and checkpoint-initialized QLoRA
+GRPO with a frozen local rubric judge and `"sft_ref"` KL anchor on a thread-grouped 10% holdout
+within 12 GB VRAM, keeping generated runs and private sample outputs local and git-ignored. Start
+with the [plan](workshops/email-reply/PLAN.md).
+
+### Stage 10: Decide
 
 Use the study-kit templates and the evidence from the workshops to make the decisions listed
 under [Intended result](#intended-result). For managed hosting, see the email workshop's
